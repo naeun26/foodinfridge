@@ -85,9 +85,9 @@
 }
 
 .nav-bookmark-btn--active {
-  background-color: var(--color-surface-dark);
-  border-color: var(--color-surface-dark);
-  color: var(--color-on-dark);
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
 }
 
 .nav-bookmark-btn__star {
@@ -98,7 +98,7 @@
 }
 
 .nav-bookmark-btn--active .nav-bookmark-btn__star {
-  color: var(--color-accent-amber);
+  color: #fff3d1;
 }
 
 .nav-bookmark-btn__count {
@@ -117,8 +117,8 @@
 }
 
 .nav-bookmark-btn--active .nav-bookmark-btn__count {
-  background-color: var(--color-surface-dark-elevated);
-  color: var(--color-on-dark);
+  background-color: rgba(255, 255, 255, 0.24);
+  color: var(--color-on-primary);
 }
 
 /* --------------------------------------------------------------------------
@@ -359,8 +359,8 @@
 }
 
 .category-tab--active {
-  background-color: var(--color-surface-card);
-  color: var(--color-ink);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
 }
 
 .category-tab__count {
@@ -368,6 +368,10 @@
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--color-primary);
+}
+
+.category-tab--active .category-tab__count {
+  color: rgba(255, 255, 255, 0.92);
 }
 
 /* Ingredient Squircle Grid (2-col mobile, 3-col tablet, 4-col desktop) */
@@ -424,7 +428,7 @@
 }
 
 .ingredient-card--selected {
-  background-color: var(--color-surface-card);
+  background-color: var(--color-accent-surface);
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px var(--color-primary-ring);
 }
@@ -537,13 +541,14 @@
 }
 
 .time-pill--active {
-  background-color: var(--color-surface-dark);
-  border-color: var(--color-surface-dark);
-  color: var(--color-on-dark);
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-ring);
 }
 
 .time-pill--active .time-pill__sub {
-  color: var(--color-on-dark-soft);
+  color: rgba(255, 255, 255, 0.88);
 }
 
 /* Sticky Bottom CTA Bar */
@@ -693,15 +698,15 @@
   background-color: var(--color-surface-cream-strong);
 }
 
-/* Top Pick #1 editorial featured surface (dark product card per DESIGN-claude.md) */
+/* Top Pick #1 featured card — rich saturated warm apricot-coral surface */
 .recipe-card--featured {
-  background-color: var(--color-surface-dark);
-  border-color: var(--color-surface-dark);
-  color: var(--color-on-dark);
+  background-color: var(--color-accent-surface);
+  border: 1.5px solid var(--color-primary);
+  color: var(--color-ink);
 }
 
 .recipe-card--featured:active {
-  background-color: var(--color-surface-dark-soft);
+  background-color: var(--color-accent-surface-strong);
 }
 
 .recipe-card__top {
@@ -736,7 +741,7 @@
 }
 
 .recipe-card--featured .recipe-card__time {
-  color: var(--color-on-dark-soft);
+  color: var(--color-accent-ink);
 }
 
 .bookmark-icon-btn {
@@ -759,14 +764,14 @@
 }
 
 .recipe-card--featured .bookmark-icon-btn {
-  background-color: var(--color-surface-dark-elevated);
-  border-color: var(--color-dark-hairline);
-  color: var(--color-on-dark-soft);
+  background-color: var(--color-canvas);
+  border-color: var(--color-accent-border);
+  color: var(--color-accent-ink);
 }
 
 .recipe-card--featured .bookmark-icon-btn--saved {
-  color: var(--color-accent-amber);
-  border-color: var(--color-accent-amber);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .recipe-card__title {
@@ -781,7 +786,7 @@
 }
 
 .recipe-card--featured .recipe-card__title {
-  color: var(--color-on-dark);
+  color: var(--color-ink);
 }
 
 .recipe-card__rows {
@@ -793,7 +798,7 @@
 }
 
 .recipe-card--featured .recipe-card__rows {
-  border-top-color: var(--color-dark-hairline);
+  border-top-color: var(--color-accent-border);
 }
 
 .recipe-meta-row {
@@ -811,7 +816,7 @@
 }
 
 .recipe-card--featured .recipe-meta-row__label {
-  color: var(--color-on-dark-soft);
+  color: var(--color-accent-ink);
 }
 
 .ing-chip {
@@ -829,8 +834,8 @@
 }
 
 .recipe-card--featured .ing-chip--owned {
-  background-color: rgba(93, 184, 114, 0.2);
-  color: #9be5ac;
+  background-color: rgba(93, 184, 114, 0.24);
+  color: #1f5a2d;
 }
 
 .ing-chip--missing {
@@ -839,8 +844,8 @@
 }
 
 .recipe-card--featured .ing-chip--missing {
-  background-color: rgba(232, 165, 90, 0.2);
-  color: #f4be7b;
+  background-color: rgba(204, 120, 92, 0.22);
+  color: var(--color-accent-ink);
 }
 
 .ing-chip--neutral {
@@ -856,7 +861,7 @@
 }
 
 .recipe-card--featured .recipe-card__seasonings {
-  color: var(--color-on-dark-soft);
+  color: var(--color-body-strong);
 }
 
 .recipe-card__footer {
@@ -870,7 +875,7 @@
 }
 
 .recipe-card--featured .recipe-card__footer {
-  color: var(--color-accent-amber);
+  color: var(--color-primary-active);
 }
 
 /* --------------------------------------------------------------------------
@@ -989,12 +994,12 @@
   gap: 8px;
 }
 
-/* Dark Kitchen Cooking Band */
+/* Warm Saturated Coral-Peach Cooking Band */
 .cooking-band {
-  background-color: var(--color-surface-dark);
-  color: var(--color-on-dark);
+  background-color: var(--color-accent-surface-strong);
+  color: var(--color-ink);
   padding: var(--space-xl) 0 var(--space-xxl);
-  border-top: 1px solid var(--color-dark-hairline);
+  border-top: 1.5px solid var(--color-accent-border);
 }
 
 .cooking-band__header {
@@ -1012,13 +1017,13 @@
   font-size: clamp(1.5rem, 3.2vw, 2rem);
   font-weight: 400;
   letter-spacing: -0.02em;
-  color: var(--color-on-dark);
+  color: var(--color-ink);
 }
 
 .cooking-band__hint {
   margin: 4px 0 0;
   font-size: 0.875rem;
-  color: var(--color-on-dark-soft);
+  color: var(--color-accent-ink);
 }
 
 .steps-stack {
@@ -1027,13 +1032,13 @@
   gap: var(--space-md);
 }
 
-/* Individual Dark Step Card */
+/* Individual Warm Step Card */
 .step-card {
   padding: 22px;
   border-radius: var(--radius-lg);
-  background-color: var(--color-surface-dark-soft);
-  border: 1.5px solid var(--color-dark-hairline);
-  transition: border-color 180ms ease;
+  background-color: var(--color-canvas);
+  border: 1.5px solid var(--color-accent-border);
+  transition: border-color 180ms ease, background-color 180ms ease;
 }
 
 @media (min-width: 640px) {
@@ -1043,10 +1048,13 @@
 }
 
 .step-card--running {
-  border-color: var(--color-accent-amber);
+  background-color: #fff6f0;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-ring);
 }
 
 .step-card--done {
+  background-color: #f0faf2;
   border-color: var(--color-success);
 }
 
@@ -1062,53 +1070,56 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent-surface);
   font-family: var(--font-mono);
   font-size: 0.78rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  color: var(--color-on-dark-soft);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--color-accent-ink);
 }
 
 .step-card__status-tag {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 3px 10px;
+  padding: 4px 10px;
   border-radius: var(--radius-pill);
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .step-card__status-tag--running {
-  background-color: rgba(232, 165, 90, 0.16);
-  color: var(--color-accent-amber);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
 }
 
 .step-card__status-tag--paused {
-  background-color: rgba(160, 157, 150, 0.16);
-  color: var(--color-on-dark-soft);
+  background-color: var(--color-accent-surface);
+  color: var(--color-accent-ink);
 }
 
 .step-card__status-tag--done {
-  background-color: rgba(93, 184, 114, 0.2);
-  color: var(--color-success);
+  background-color: rgba(93, 184, 114, 0.22);
+  color: #216634;
 }
 
 .step-card__instruction {
   margin: 0;
   font-size: 1.0625rem;
-  line-height: 1.65;
-  color: var(--color-on-dark);
+  line-height: 1.68;
+  color: var(--color-ink);
   word-break: keep-all;
 }
 
-/* Timer Module inside Dark Step Card (Button Height >= 56px per PRD) */
+/* Timer Module inside Step Card (Button Height >= 56px per PRD) */
 .timer-box {
   margin-top: 18px;
   padding: 16px;
   border-radius: var(--radius-md);
-  background-color: var(--color-surface-dark);
-  border: 1px solid var(--color-dark-hairline);
+  background-color: var(--color-accent-surface);
+  border: 1px solid var(--color-accent-border);
 }
 
 .timer-box__top {
@@ -1125,27 +1136,28 @@
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.02em;
-  color: var(--color-on-dark);
+  color: var(--color-ink);
 }
 
 .step-card--running .timer-box__digits {
-  color: var(--color-accent-amber);
+  color: var(--color-primary-active);
 }
 
 .step-card--done .timer-box__digits {
-  color: var(--color-success);
+  color: #216634;
 }
 
 .timer-box__label {
   font-size: 0.8125rem;
-  color: var(--color-on-dark-soft);
+  font-weight: 500;
+  color: var(--color-accent-ink);
 }
 
 .timer-progress {
   width: 100%;
-  height: 4px;
+  height: 5px;
   border-radius: var(--radius-pill);
-  background-color: var(--color-surface-dark-elevated);
+  background-color: rgba(204, 120, 92, 0.2);
   overflow: hidden;
   margin-bottom: 14px;
 }
@@ -1153,7 +1165,7 @@
 .timer-progress__fill {
   height: 100%;
   width: 0%;
-  background-color: var(--color-accent-amber);
+  background-color: var(--color-primary);
   transition: width 220ms linear;
 }
 
@@ -1190,19 +1202,19 @@
 }
 
 .timer-btn--secondary {
-  background-color: var(--color-surface-dark-elevated);
-  border: 1px solid var(--color-dark-hairline);
-  color: var(--color-on-dark);
+  background-color: var(--color-canvas);
+  border: 1.5px solid var(--color-accent-border);
+  color: var(--color-ink);
 }
 
 .timer-btn--secondary:active {
-  background-color: #32302c;
+  background-color: var(--color-surface-card);
 }
 
 .timer-btn--done {
-  background-color: rgba(93, 184, 114, 0.18);
+  background-color: var(--color-success);
   border: 1px solid var(--color-success);
-  color: var(--color-success);
+  color: #ffffff;
 }
 
 /* --------------------------------------------------------------------------
@@ -1509,8 +1521,8 @@
 }
 
 .recipe-card--featured .badge-custom {
-  background-color: rgba(93, 184, 166, 0.24);
-  color: #9de2d4;
+  background-color: rgba(93, 184, 166, 0.28);
+  color: #165247;
 }
 
 .btn-danger-ghost {

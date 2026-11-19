@@ -8,8 +8,12 @@
   --color-primary: #cc785c;
   --color-primary-active: #a9583e;
   --color-primary-disabled: #e6dfd8;
-  --color-primary-ring: rgba(204, 120, 92, 0.18);
-  --color-primary-tint: rgba(204, 120, 92, 0.09);
+  --color-primary-ring: rgba(204, 120, 92, 0.24);
+  --color-primary-tint: rgba(204, 120, 92, 0.12);
+  --color-accent-surface: #fae0d2;
+  --color-accent-surface-strong: #f4cdb8;
+  --color-accent-border: #dfa489;
+  --color-accent-ink: #7d361d;
 
   /* Text */
   --color-ink: #141413;
