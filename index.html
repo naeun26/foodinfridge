@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="요리에 서툰 2030 1인 가구 직장인을 위한 냉장고 털이 한 끼 — 남은 자투리 재료와 조리 시간만 고르면 초간단 레시피와 단계별 타이머를 바로 제공합니다."
+    />
+    <meta name="theme-color" content="#faf9f5" />
+    <title>냉장고 털이 한 끼 — 남은 재료로 30분 이내 초간단 레시피</title>
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23cc785c'/%3E%3Cpath d='M16 7V25M7 16H25M9.6 9.6L22.4 22.4M22.4 9.6L9.6 22.4' stroke='%23ffffff' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+
+    <!-- Editorial Typography (DESIGN-claude.md Substitutes + Korean Pairing) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Serif+KR:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      as="style"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+
+    <!-- Design System Stylesheets -->
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+  </head>
+  <body>
+    <header id="top-nav" class="top-nav"></header>
+
+    <main id="app-main" class="app-main"></main>
+
+    <footer id="site-footer" class="site-footer">
+      <div class="container site-footer__inner">
+        <div class="site-footer__brand">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M12 2.5V21.5M2.5 12H21.5M5.28 5.28L18.72 18.72M18.72 5.28L5.28 18.72"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span>냉장고 털이 한 끼</span>
+        </div>
+        <p class="site-footer__meta">
+          v1.1 MVP · 로그인 없이 즉시 사용 · 기본 양념 4종(소금·설탕·간장·식용유) 전제 · 보관함은 브라우저에 자동 저장됩니다.
+        </p>
+      </div>
+    </footer>
+
+    <div id="live-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Application Modules (file:// & HTTPS Vercel Zero-Config Compatible) -->
+    <script defer src="js/data/ingredients.js"></script>
+    <script defer src="js/data/recipes.js"></script>
+    <script defer src="js/core/matching.js"></script>
+    <script defer src="js/core/storage.js"></script>
+    <script defer src="js/core/kitchenApi.js"></script>
+    <script defer src="js/app.js"></script>
+  </body>
+</html>

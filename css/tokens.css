@@ -1,0 +1,74 @@
+/* ==========================================================================
+   Design Tokens — Synthesized from DESIGN-claude.md
+   Warm editorial cream canvas + warm coral CTA + dark product surfaces
+   ========================================================================== */
+
+:root {
+  /* Brand & Accent */
+  --color-primary: #cc785c;
+  --color-primary-active: #a9583e;
+  --color-primary-disabled: #e6dfd8;
+  --color-primary-ring: rgba(204, 120, 92, 0.18);
+  --color-primary-tint: rgba(204, 120, 92, 0.09);
+
+  /* Text */
+  --color-ink: #141413;
+  --color-body-strong: #252523;
+  --color-body: #3d3d3a;
+  --color-muted: #6c6a64;
+  --color-muted-soft: #8e8b82;
+  --color-on-primary: #ffffff;
+  --color-on-dark: #faf9f5;
+  --color-on-dark-soft: #a09d96;
+
+  /* Surfaces & Hairlines */
+  --color-canvas: #faf9f5;
+  --color-surface-soft: #f5f0e8;
+  --color-surface-card: #efe9de;
+  --color-surface-cream-strong: #e8e0d2;
+  --color-surface-dark: #181715;
+  --color-surface-dark-elevated: #252320;
+  --color-surface-dark-soft: #1f1e1b;
+  --color-hairline: #e6dfd8;
+  --color-hairline-soft: #ebe6df;
+  --color-dark-hairline: #32302c;
+
+  /* Semantic & Secondary Accents */
+  --color-accent-teal: #5db8a6;
+  --color-accent-amber: #e8a55a;
+  --color-success: #5db872;
+  --color-warning: #d4a017;
+  --color-error: #c64545;
+
+  /* Typography Families */
+  --font-display: "Cormorant Garamond", "Noto Serif KR", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Spacing Scale (4px base) */
+  --space-xxs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+  --space-section: 72px;
+
+  /* Border Radius Scale */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 9999px;
+
+  /* Subtle Shadow (Color-block first, shadow rare) */
+  --shadow-subtle: 0 1px 3px rgba(20, 20, 19, 0.08);
+  --shadow-sticky: 0 -4px 16px rgba(20, 20, 19, 0.06);
+
+  /* Layout */
+  --container-max: 1080px;
+  --container-narrow: 760px;
+  --nav-height: 64px;
+}
