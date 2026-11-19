@@ -7,9 +7,12 @@
   // Inline SVG Icons (Crisp stroke-based icons + Editorial radial spike mark)
   // =========================================================================
   var ICONS = {
-    spikeMark:
+    brandLogo:
       '<svg class="brand-mark__glyph" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-      '<path d="M12 2.5V21.5M2.5 12H21.5M5.28 5.28L18.72 18.72M18.72 5.28L5.28 18.72" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+      '<rect x="5" y="2.5" width="14" height="19" rx="3" stroke="currentColor" stroke-width="1.9"/>' +
+      '<path d="M5 10H19" stroke="currentColor" stroke-width="1.8"/>' +
+      '<path d="M8.5 5.8V7.6M8.5 13V16.2" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round"/>' +
+      '<circle cx="15.5" cy="6.4" r="1.1" fill="var(--color-primary)"/>' +
       '</svg>',
     starOutline:
       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
@@ -278,7 +281,7 @@
     dom.topNav.innerHTML =
       '<div class="container top-nav__inner">' +
       '  <button type="button" class="brand-mark" data-action="go-home" aria-label="냉장고 털이 한 끼 홈으로 이동">' +
-      ICONS.spikeMark +
+      ICONS.brandLogo +
       '    <span class="brand-mark__wordmark">냉장고 털이 한 끼</span>' +
       '    <span class="brand-mark__sub">초간단 자취 레시피</span>' +
       '  </button>' +
