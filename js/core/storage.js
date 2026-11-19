@@ -5,7 +5,6 @@
 
   var STORAGE_KEY = 'fridge_meal_bookmarks';
   var CUSTOM_RECIPES_KEY = 'fridge_meal_custom_recipes';
-  var GEMINI_KEY_STORAGE = 'fridge_meal_gemini_key';
 
   function sanitizeCustomRecipe(raw) {
     if (!raw || typeof raw !== 'object') return null;
@@ -199,28 +198,6 @@
     return { bookmarks: current, isSaved: isSaved };
   }
 
-  function readGeminiApiKey() {
-    try {
-      return (global.localStorage.getItem(GEMINI_KEY_STORAGE) || '').trim();
-    } catch (err) {
-      return '';
-    }
-  }
-
-  function writeGeminiApiKey(key) {
-    try {
-      var trimmed = String(key || '').trim();
-      if (!trimmed) {
-        global.localStorage.removeItem(GEMINI_KEY_STORAGE);
-      } else {
-        global.localStorage.setItem(GEMINI_KEY_STORAGE, trimmed);
-      }
-      return true;
-    } catch (err) {
-      return false;
-    }
-  }
-
   FridgeMeal.storage = {
     STORAGE_KEY: STORAGE_KEY,
     CUSTOM_RECIPES_KEY: CUSTOM_RECIPES_KEY,
@@ -230,8 +207,6 @@
     readCustomRecipes: readCustomRecipes,
     saveCustomRecipe: saveCustomRecipe,
     deleteCustomRecipe: deleteCustomRecipe,
-    getAllRecipes: getAllRecipes,
-    readGeminiApiKey: readGeminiApiKey,
-    writeGeminiApiKey: writeGeminiApiKey
+    getAllRecipes: getAllRecipes
   };
 })(window);

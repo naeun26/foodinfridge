@@ -58,18 +58,6 @@
       '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" aria-hidden="true">' +
       '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>' +
       '</svg>',
-    camera:
-      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-      '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>' +
-      '</svg>',
-    image:
-      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-      '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>' +
-      '</svg>',
-    key:
-      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-      '<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>' +
-      '</svg>',
     edit:
       '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
       '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>' +
@@ -114,16 +102,6 @@
     },
     timers: new Map(),
     tickerId: null,
-    vision: {
-      status: 'idle', // 'idle' | 'loading' | 'success' | 'error'
-      previewUrl: '',
-      matchedIngredients: [],
-      otherIngredients: [],
-      summary: '',
-      error: '',
-      showKeyPanel: false,
-      keySavedMessage: ''
-    },
     draft: createEmptyDraft()
   };
 
@@ -399,7 +377,7 @@
   }
 
   // =========================================================================
-  // Rendering: Screen 1 — Home (Photo Scanner + Ingredients + Cook Time)
+  // Rendering: Screen 1 — Home (Ingredients + Cook Time)
   // =========================================================================
   function getCategorySelectedCount(categoryId) {
     if (categoryId === 'all') return state.selectedIngredients.size;
@@ -411,112 +389,6 @@
       }
     }
     return count;
-  }
-
-  function renderVisionCard() {
-    var v = state.vision;
-    var savedKey = FridgeMeal.storage.readGeminiApiKey();
-
-    var resultHtml = '';
-    if (v.status === 'loading') {
-      resultHtml =
-        '<div class="vision-result ' +
-        (v.previewUrl ? 'vision-result--with-photo' : '') +
-        '">' +
-        (v.previewUrl ? '<img class="vision-result__thumb" src="' + v.previewUrl + '" alt="업로드한 냉장고 사진 미리보기" />' : '') +
-        '  <div class="vision-result__body">' +
-        '    <div class="vision-status"><span class="vision-spinner" aria-hidden="true"></span><span>AI가 냉장고 사진에서 식재료를 찾고 있어요...</span></div>' +
-        '    <p class="body-sm">사진 크기에 따라 2~5초 정도 걸릴 수 있어요.</p>' +
-        '  </div>' +
-        '</div>';
-    } else if (v.status === 'success') {
-      var matchedChips = v.matchedIngredients.length
-        ? v.matchedIngredients
-            .map(function (name) {
-              return '<span class="ing-chip ing-chip--owned">✓ ' + escapeHtml(name) + '</span>';
-            })
-            .join('')
-        : '<span class="body-sm">20종 기본 목록과 일치하는 재료를 찾지 못했어요.</span>';
-
-      var otherHtml = v.otherIngredients.length
-        ? '<p class="body-sm">목록 외 감지됨: ' + escapeHtml(v.otherIngredients.join(', ')) + '</p>'
-        : '';
-
-      resultHtml =
-        '<div class="vision-result vision-result--with-photo">' +
-        (v.previewUrl ? '<img class="vision-result__thumb" src="' + v.previewUrl + '" alt="분석된 냉장고 사진" />' : '') +
-        '  <div class="vision-result__body">' +
-        '    <div class="vision-status">' +
-        escapeHtml(v.summary) +
-        '</div>' +
-        '    <div class="ingredients-chip-list">' +
-        matchedChips +
-        '</div>' +
-        otherHtml +
-        '    <div><button type="button" class="btn-text" data-action="clear-vision">분석 결과 닫기</button></div>' +
-        '  </div>' +
-        '</div>';
-    } else if (v.status === 'error') {
-      resultHtml =
-        '<div class="vision-result ' +
-        (v.previewUrl ? 'vision-result--with-photo' : '') +
-        '">' +
-        (v.previewUrl ? '<img class="vision-result__thumb" src="' + v.previewUrl + '" alt="업로드한 냉장고 사진" />' : '') +
-        '  <div class="vision-result__body">' +
-        '    <p class="vision-error">' +
-        escapeHtml(v.error) +
-        '</p>' +
-        '    <div><button type="button" class="btn-text" data-action="clear-vision">닫기</button></div>' +
-        '  </div>' +
-        '</div>';
-    }
-
-    var keyPanelHtml = v.showKeyPanel
-      ? '<div class="vision-key-panel">' +
-        '  <p class="body-sm"><strong>Gemini API 키 설정 (선택)</strong> — Vercel 환경변수(<code>GEMINI_API_KEY</code>)가 설정된 배포 주소에서는 키 없이 바로 동작합니다. 로컬에서 테스트하거나 개인 키를 쓰려면 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>에서 무료 키를 발급받아 아래에 입력하세요. (브라우저에만 저장됨)</p>' +
-        '  <div class="vision-key-row">' +
-        '    <input type="password" class="form-input" id="gemini-key-input" placeholder="AIza... 로 시작하는 Gemini API 키 입력" value="' +
-        escapeHtml(savedKey) +
-        '" autocomplete="off" />' +
-        '    <button type="button" class="btn-primary" data-action="save-gemini-key">키 저장</button>' +
-        (savedKey ? '<button type="button" class="btn-secondary" data-action="delete-gemini-key">키 삭제</button>' : '') +
-        '  </div>' +
-        (v.keySavedMessage ? '<p class="body-sm" style="color: var(--color-primary);">' + escapeHtml(v.keySavedMessage) + '</p>' : '') +
-        '</div>'
-      : '';
-
-    return (
-      '<div class="vision-card">' +
-      '  <div class="vision-card__top">' +
-      '    <div>' +
-      '      <div class="vision-card__title-row">' +
-      '        <span class="title-sm">냉장고 사진으로 식재료 자동 인식</span>' +
-      '        <span class="badge-coral">AI</span>' +
-      '      </div>' +
-      '      <p class="body-sm" style="margin-top: 3px;">냉장고 속이나 식재료를 찍어 올리면, 보이는 재료를 자동으로 찾아 아래 목록에 체크해 드려요.</p>' +
-      '    </div>' +
-      '    <button type="button" class="btn-text" data-action="toggle-key-panel">' +
-      ICONS.key +
-      '<span>' +
-      (savedKey ? 'API 키 설정됨' : 'API 키 설정') +
-      '</span></button>' +
-      '  </div>' +
-      '  <div class="vision-card__actions">' +
-      '    <label class="btn-primary vision-upload-label">' +
-      ICONS.camera +
-      '      <span>사진 찍기</span>' +
-      '      <input type="file" class="vision-file-input" accept="image/*" capture="environment" data-vision-input />' +
-      '    </label>' +
-      '    <label class="btn-secondary vision-upload-label">' +
-      ICONS.image +
-      '      <span>앨범에서 사진 선택</span>' +
-      '      <input type="file" class="vision-file-input" accept="image/*" data-vision-input />' +
-      '    </label>' +
-      '  </div>' +
-      resultHtml +
-      keyPanelHtml +
-      '</div>'
-    );
   }
 
   function renderHomeView() {
@@ -616,12 +488,11 @@
       '      <span>로그인 없이 바로 시작하는 1인 가구 한 끼</span>' +
       '    </div>' +
       '    <h1 class="display-lg">냉장고 속 남은 재료로,<br/>오늘의 한 끼를 바로 꺼내세요.</h1>' +
-      '    <p class="body-md hero-subtitle">가진 재료를 직접 고르거나 냉장고 사진을 찍어 올리면, 재료를 가장 많이 소진할 수 있는 초간단 레시피와 단계별 타이머를 바로 열어드립니다.</p>' +
+      '    <p class="body-md hero-subtitle">가진 재료를 개수 제한 없이 누르고 조리 시간만 고르면, 재료를 가장 많이 소진할 수 있는 초간단 레시피와 단계별 타이머를 바로 열어드립니다.</p>' +
       '    <div class="seasoning-notice" role="note">' +
       '      <span class="seasoning-notice__icon" aria-hidden="true">✓</span>' +
       '      <p class="seasoning-notice__text"><strong>소금·설탕·간장·식용유</strong>는 집에 있는 것으로 가정해요. 별도 양념 체크 없이 주재료만 골라주세요.</p>' +
       '    </div>' +
-      renderVisionCard() +
       '  </section>' +
       '  <section class="section-block" aria-labelledby="ingredients-heading">' +
       '    <div class="section-header">' +
@@ -1467,50 +1338,6 @@
   }
 
   // =========================================================================
-  // Fridge Photo Analysis Handler
-  // =========================================================================
-  function handleVisionFileChange(fileInput) {
-    var file = fileInput.files && fileInput.files[0];
-    if (!file) return;
-
-    state.vision.status = 'loading';
-    state.vision.error = '';
-    state.vision.keySavedMessage = '';
-    renderHomeView();
-
-    FridgeMeal.fridgeVision
-      .analyzeFridgePhoto(file)
-      .then(function (result) {
-        state.vision.status = 'success';
-        state.vision.previewUrl = result.previewUrl || '';
-        state.vision.matchedIngredients = result.matchedIngredients || [];
-        state.vision.otherIngredients = result.otherIngredients || [];
-        state.vision.summary = result.summary || '';
-        state.vision.error = '';
-
-        for (var i = 0; i < state.vision.matchedIngredients.length; i++) {
-          state.selectedIngredients.add(state.vision.matchedIngredients[i]);
-        }
-
-        renderHomeView();
-        announce(
-          state.vision.matchedIngredients.length > 0
-            ? '사진에서 ' + state.vision.matchedIngredients.length + '개 식재료를 인식해 자동 선택했습니다.'
-            : '사진 분석이 완료되었습니다.'
-        );
-      })
-      .catch(function (err) {
-        state.vision.status = 'error';
-        state.vision.previewUrl = (err && err.previewUrl) || '';
-        state.vision.error = (err && err.message) || '사진 분석 중 오류가 발생했습니다.';
-        if (err && err.code === 'NEED_API_KEY') {
-          state.vision.showKeyPanel = true;
-        }
-        renderHomeView();
-      });
-  }
-
-  // =========================================================================
   // Custom Recipe Submit Handler
   // =========================================================================
   function handleCustomRecipeSubmit(event) {
@@ -1655,42 +1482,6 @@
       } else {
         navigateTo('home');
       }
-      return;
-    }
-
-    if (action === 'toggle-key-panel') {
-      state.vision.showKeyPanel = !state.vision.showKeyPanel;
-      state.vision.keySavedMessage = '';
-      renderHomeView();
-      return;
-    }
-
-    if (action === 'save-gemini-key') {
-      var keyInput = document.getElementById('gemini-key-input');
-      var val = keyInput ? keyInput.value.trim() : '';
-      FridgeMeal.storage.writeGeminiApiKey(val);
-      state.vision.keySavedMessage = val
-        ? 'API 키가 브라우저에 저장되었습니다. 이제 사진을 선택해 분석해 보세요!'
-        : '저장된 키를 비웠습니다.';
-      renderHomeView();
-      return;
-    }
-
-    if (action === 'delete-gemini-key') {
-      FridgeMeal.storage.writeGeminiApiKey('');
-      state.vision.keySavedMessage = '저장된 API 키를 삭제했습니다.';
-      renderHomeView();
-      return;
-    }
-
-    if (action === 'clear-vision') {
-      state.vision.status = 'idle';
-      state.vision.previewUrl = '';
-      state.vision.matchedIngredients = [];
-      state.vision.otherIngredients = [];
-      state.vision.summary = '';
-      state.vision.error = '';
-      renderHomeView();
       return;
     }
 
@@ -1844,13 +1635,6 @@
     }
   }
 
-  function handleChange(event) {
-    var el = event.target;
-    if (el && el.hasAttribute('data-vision-input')) {
-      handleVisionFileChange(el);
-    }
-  }
-
   function handleSubmit(event) {
     if (event.target && event.target.id === 'custom-recipe-form') {
       handleCustomRecipeSubmit(event);
@@ -1891,7 +1675,6 @@
 
     document.addEventListener('click', handleClick);
     document.addEventListener('input', handleInput);
-    document.addEventListener('change', handleChange);
     document.addEventListener('submit', handleSubmit);
     document.addEventListener('keydown', handleKeyDown);
 
