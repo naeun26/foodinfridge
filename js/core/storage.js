@@ -5,6 +5,8 @@
 
   var STORAGE_KEY = 'fridge_meal_bookmarks';
   var CUSTOM_RECIPES_KEY = 'fridge_meal_custom_recipes';
+  var RECENT_COOKED_KEY = 'fridge_meal_recent_cooked';
+  var MAX_RECENT_COOKED = 3;
 
   function sanitizeCustomRecipe(raw) {
     if (!raw || typeof raw !== 'object') return null;
@@ -126,7 +128,7 @@
     });
     writeCustomRecipes(next);
 
-    // 삭제된 나만의 레시피가 보관함에도 있었다면 함께 정리
+    // 삭제된 나만의 레시피가 보관함이나 최근 만든 기록에도 있었다면 함께 정리
     var bookmarks = readBookmarks();
     if (bookmarks.indexOf(recipeId) !== -1) {
       writeBookmarks(
@@ -134,6 +136,13 @@
           return id !== recipeId;
         })
       );
+    }
+    var recent = readRecentCooked();
+    var filteredRecent = recent.filter(function (entry) {
+      return entry.recipeId !== recipeId;
+    });
+    if (filteredRecent.length !== recent.length) {
+      writeRecentCooked(filteredRecent);
     }
     return next;
   }
@@ -198,15 +207,70 @@
     return { bookmarks: current, isSaved: isSaved };
   }
 
+  function readRecentCooked() {
+    try {
+      var raw = global.localStorage.getItem(RECENT_COOKED_KEY);
+      if (!raw) return [];
+      var parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
+
+      var validIds = getValidRecipeIds();
+      var seen = new Set();
+      var result = [];
+      for (var i = 0; i < parsed.length; i++) {
+        var item = parsed[i];
+        var id = typeof item === 'string' ? item : item && item.recipeId;
+        var cookedAt =
+          item && typeof item.cookedAt === 'number' && Number.isFinite(item.cookedAt)
+            ? item.cookedAt
+            : Date.now();
+        if (typeof id === 'string' && validIds.has(id) && !seen.has(id)) {
+          seen.add(id);
+          result.push({ recipeId: id, cookedAt: cookedAt });
+          if (result.length >= MAX_RECENT_COOKED) break;
+        }
+      }
+      return result;
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function writeRecentCooked(list) {
+    try {
+      global.localStorage.setItem(RECENT_COOKED_KEY, JSON.stringify(list));
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function recordCookedRecipe(recipeId) {
+    if (!recipeId || !getValidRecipeIds().has(recipeId)) {
+      return readRecentCooked();
+    }
+    var current = readRecentCooked().filter(function (entry) {
+      return entry.recipeId !== recipeId;
+    });
+    current.unshift({ recipeId: recipeId, cookedAt: Date.now() });
+    var trimmed = current.slice(0, MAX_RECENT_COOKED);
+    writeRecentCooked(trimmed);
+    return trimmed;
+  }
+
   FridgeMeal.storage = {
     STORAGE_KEY: STORAGE_KEY,
     CUSTOM_RECIPES_KEY: CUSTOM_RECIPES_KEY,
+    RECENT_COOKED_KEY: RECENT_COOKED_KEY,
+    MAX_RECENT_COOKED: MAX_RECENT_COOKED,
     readBookmarks: readBookmarks,
     writeBookmarks: writeBookmarks,
     toggleBookmark: toggleBookmark,
     readCustomRecipes: readCustomRecipes,
     saveCustomRecipe: saveCustomRecipe,
     deleteCustomRecipe: deleteCustomRecipe,
+    readRecentCooked: readRecentCooked,
+    recordCookedRecipe: recordCookedRecipe,
     getAllRecipes: getAllRecipes
   };
 })(window);

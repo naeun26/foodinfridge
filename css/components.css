@@ -1669,3 +1669,51 @@
   font-size: 0.875rem;
   font-weight: 600;
 }
+
+
+/* --------------------------------------------------------------------------
+   Screen 3: Cooking Complete Action Box
+   -------------------------------------------------------------------------- */
+.cook-complete-box {
+  margin-top: var(--space-lg);
+  padding: 22px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-canvas);
+  border: 1.5px solid var(--color-accent-border);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  text-align: center;
+}
+
+.cook-complete-box--done {
+  background-color: #f0faf2;
+  border-color: var(--color-success);
+}
+
+.cook-complete-box__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.cook-complete-box__desc {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+.cook-complete-box__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.cook-complete-btn {
+  min-height: 54px;
+  min-width: 220px;
+  font-size: 1.05rem;
+}

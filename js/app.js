@@ -96,6 +96,8 @@
     currentRecipeId: null,
     bookmarks: [],
     customRecipes: [],
+    recentCooked: [],
+    cookedThisVisit: false,
     wakeLock: {
       active: false,
       supported: FridgeMeal.kitchenApi.isWakeLockSupported()
@@ -385,9 +387,11 @@
       }
       state.previousView = options.from || (state.view === 'detail' ? state.previousView : state.view);
       state.currentRecipeId = recipe.id;
+      state.cookedThisVisit = false;
       initTimersForRecipe(recipe);
     } else {
       state.currentRecipeId = null;
+      state.cookedThisVisit = false;
     }
 
     if (view === 'create') {
@@ -747,6 +751,12 @@
         entry.matchCount +
         '개 일치</span>' +
         (entry.missingCount === 0 ? '<span class="badge-success">추가 재료 없음</span>' : '') +
+        customBadgeHtml;
+    } else if (entry.recentLabel) {
+      matchBadgeHtml =
+        '<span class="badge-coral">' +
+        escapeHtml(entry.recentLabel) +
+        '</span>' +
         customBadgeHtml;
     } else {
       matchBadgeHtml =
@@ -1217,6 +1227,26 @@
       '    <div class="steps-stack">' +
       stepsHtml +
       '    </div>' +
+      '    <div class="cook-complete-box ' +
+      (state.cookedThisVisit ? 'cook-complete-box--done' : '') +
+      '">' +
+      (state.cookedThisVisit
+        ? '      <p class="cook-complete-box__title">🎉 요리를 완료했어요!</p>' +
+          '      <p class="cook-complete-box__desc">보관함의 <strong>최근 만든 레시피</strong>(최대 3개)에 기록되었습니다.</p>' +
+          '      <div class="cook-complete-box__actions">' +
+          '        <button type="button" class="btn-primary" data-action="open-bookmarks">보관함에서 확인하기</button>' +
+          '        <button type="button" class="btn-secondary" data-action="go-home">다른 재료로 찾기</button>' +
+          '      </div>'
+        : '      <p class="cook-complete-box__title">맛있게 완성하셨나요?</p>' +
+          '      <p class="cook-complete-box__desc">완료 버튼을 누르면 보관함의 최근 만든 레시피(최대 3개)에 기록돼요.</p>' +
+          '      <div class="cook-complete-box__actions">' +
+          '        <button type="button" class="btn-primary cook-complete-btn" data-action="complete-cooking" data-recipe-id="' +
+          recipe.id +
+          '">' +
+          ICONS.check +
+          '<span>요리 완료</span></button>' +
+          '      </div>') +
+      '    </div>' +
       '  </div>' +
       '</section>';
 
@@ -1224,9 +1254,61 @@
   }
 
   // =========================================================================
-  // Rendering: Screen 4 — Bookmarks & My Custom Recipes View
+  // Rendering: Screen 4 — Bookmarks, Recent Cooked & My Custom Recipes View
   // =========================================================================
+  function formatCookedLabel(timestamp) {
+    var diffSec = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
+    if (diffSec < 60) return '방금 완료';
+    if (diffSec < 3600) return Math.floor(diffSec / 60) + '분 전 완료';
+    var d = new Date(timestamp);
+    var now = new Date();
+    var hh = String(d.getHours()).padStart(2, '0');
+    var mm = String(d.getMinutes()).padStart(2, '0');
+    if (
+      d.getFullYear() === now.getFullYear() &&
+      d.getMonth() === now.getMonth() &&
+      d.getDate() === now.getDate()
+    ) {
+      return '오늘 ' + hh + ':' + mm + ' 완료';
+    }
+    return d.getMonth() + 1 + '/' + d.getDate() + ' 완료';
+  }
+
   function renderBookmarksView() {
+    var recentEntries = [];
+    for (var k = 0; k < state.recentCooked.length; k++) {
+      var recEntry = state.recentCooked[k];
+      var recentRecipe = getRecipeById(recEntry.recipeId);
+      if (recentRecipe) {
+        recentEntries.push({
+          recipe: recentRecipe,
+          matchedIngredients: [],
+          missingIngredients: [],
+          matchCount: 0,
+          missingCount: 0,
+          recentLabel: formatCookedLabel(recEntry.cookedAt)
+        });
+      }
+    }
+
+    var recentSectionHtml =
+      '<section class="bookmarks-section">' +
+      '  <div class="bookmarks-section__head">' +
+      '    <h2 class="display-sm">최근 만든 레시피 <span class="badge-pill mono" style="vertical-align: middle;">' +
+      recentEntries.length +
+      ' / 3</span></h2>' +
+      '  </div>' +
+      (recentEntries.length > 0
+        ? '<div class="recipe-list">' +
+          recentEntries
+            .map(function (entry, idx) {
+              return renderRecipeCard(entry, idx, 'bookmarks');
+            })
+            .join('') +
+          '</div>'
+        : '<p class="body-sm">레시피 맨 아래의 [요리 완료] 버튼을 누르면 최근 만든 요리 최대 3개가 여기에 기록돼요.</p>') +
+      '</section>';
+
     var savedRecipes = [];
     for (var i = 0; i < state.bookmarks.length; i++) {
       var r = getRecipeById(state.bookmarks[i]);
@@ -1306,8 +1388,9 @@
       '개</span>' +
       '    </div>' +
       '    <h1 class="display-md">내 레시피 보관함</h1>' +
-      '    <p class="body-sm" style="margin-top: 6px;">즐겨찾기한 레시피와 직접 등록한 나만의 레시피가 브라우저에 자동 저장됩니다.</p>' +
+      '    <p class="body-sm" style="margin-top: 6px;">최근 만든 레시피(최대 3개), 직접 등록한 레시피, 즐겨찾기한 레시피가 브라우저에 자동 저장됩니다.</p>' +
       '  </section>' +
+      recentSectionHtml +
       customSectionHtml +
       '  <section class="bookmarks-section">' +
       '    <div class="bookmarks-section__head">' +
@@ -1649,8 +1732,20 @@
       if (!global.confirm('이 나만의 레시피를 삭제할까요?')) return;
       state.customRecipes = FridgeMeal.storage.deleteCustomRecipe(delId);
       state.bookmarks = FridgeMeal.storage.readBookmarks();
+      state.recentCooked = FridgeMeal.storage.readRecentCooked();
       announce('나만의 레시피를 삭제했습니다.');
       navigateTo('bookmarks');
+      return;
+    }
+
+    if (action === 'complete-cooking') {
+      var doneId = target.getAttribute('data-recipe-id');
+      if (!doneId) return;
+      clearAllTimers();
+      state.recentCooked = FridgeMeal.storage.recordCookedRecipe(doneId);
+      state.cookedThisVisit = true;
+      renderDetailView();
+      announce('요리 완료! 최근 만든 레시피에 기록했습니다.');
       return;
     }
 
@@ -1850,6 +1945,7 @@
 
     state.customRecipes = FridgeMeal.storage.readCustomRecipes();
     state.bookmarks = FridgeMeal.storage.readBookmarks();
+    state.recentCooked = FridgeMeal.storage.readRecentCooked();
 
     FridgeMeal.kitchenApi.subscribeWakeLock(function (wlState) {
       state.wakeLock = wlState;
