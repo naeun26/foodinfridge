@@ -1282,3 +1282,430 @@
   font-size: 0.8125rem;
   color: var(--color-on-dark-soft);
 }
+
+
+/* --------------------------------------------------------------------------
+   Top Nav Action Cluster (+ Add Recipe & Bookmarks)
+   -------------------------------------------------------------------------- */
+.top-nav__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-hairline);
+  color: var(--color-ink);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.nav-add-btn:active {
+  background-color: var(--color-surface-cream-strong);
+}
+
+.nav-add-btn--active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.nav-add-btn__label-long {
+  display: none;
+}
+
+@media (min-width: 520px) {
+  .nav-add-btn__label-short {
+    display: none;
+  }
+  .nav-add-btn__label-long {
+    display: inline;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Screen 1: Fridge Photo AI Scanner Panel
+   -------------------------------------------------------------------------- */
+.vision-card {
+  margin-top: var(--space-md);
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-soft);
+  border: 1px solid var(--color-hairline);
+}
+
+@media (min-width: 640px) {
+  .vision-card {
+    padding: 20px 22px;
+  }
+}
+
+.vision-card__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.vision-card__title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vision-card__actions {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.vision-upload-label {
+  cursor: pointer;
+}
+
+.vision-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.vision-result {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .vision-result--with-photo {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.vision-result__thumb {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-hairline);
+  flex-shrink: 0;
+}
+
+.vision-result__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vision-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+.vision-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-hairline);
+  border-top-color: var(--color-primary);
+  border-radius: var(--radius-pill);
+  animation: fridge-spin 0.8s linear infinite;
+}
+
+@keyframes fridge-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.vision-error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background-color: rgba(198, 69, 69, 0.08);
+  border: 1px solid rgba(198, 69, 69, 0.25);
+  color: #8f2d2d;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.vision-key-panel {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vision-key-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vision-key-row .form-input {
+  flex: 1 1 200px;
+}
+
+/* --------------------------------------------------------------------------
+   Screen 3: Beginner Measurement Guide & Custom Actions
+   -------------------------------------------------------------------------- */
+.measure-guide {
+  grid-column: 1 / -1;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-hairline);
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+.measure-guide strong {
+  color: var(--color-body-strong);
+  font-weight: 600;
+}
+
+.detail-header__right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge-custom {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background-color: rgba(93, 184, 166, 0.16);
+  color: #1f6457;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.recipe-card--featured .badge-custom {
+  background-color: rgba(93, 184, 166, 0.24);
+  color: #9de2d4;
+}
+
+.btn-danger-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(198, 69, 69, 0.35);
+  color: var(--color-error);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.btn-danger-ghost:active {
+  background-color: rgba(198, 69, 69, 0.08);
+}
+
+/* --------------------------------------------------------------------------
+   Screen 4: Bookmarks + My Custom Recipes Section Split
+   -------------------------------------------------------------------------- */
+.bookmarks-section {
+  margin-bottom: var(--space-xl);
+}
+
+.bookmarks-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+/* --------------------------------------------------------------------------
+   Screen 5: Custom Recipe Form (DESIGN-claude.md text-input & hairline card)
+   -------------------------------------------------------------------------- */
+.recipe-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.form-card {
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+@media (min-width: 640px) {
+  .form-card {
+    padding: 26px;
+  }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+.form-hint {
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-hairline);
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  padding: 10px 14px;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.form-input {
+  min-height: 42px;
+}
+
+.form-textarea {
+  min-height: 82px;
+  resize: vertical;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-ring);
+}
+
+.chip-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.chip-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  color: var(--color-body);
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.chip-toggle--active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.extra-ing-row {
+  display: flex;
+  gap: 8px;
+}
+
+.extra-ing-row .form-input {
+  flex: 1 1 auto;
+}
+
+.step-editor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step-editor-item {
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.step-editor-item__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.step-timer-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: var(--color-muted);
+}
+
+.step-timer-inputs .form-input {
+  width: 78px;
+  min-height: 36px;
+  padding: 6px 10px;
+  text-align: center;
+  font-family: var(--font-mono);
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.form-error-msg {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background-color: rgba(198, 69, 69, 0.08);
+  border: 1px solid rgba(198, 69, 69, 0.25);
+  color: #8f2d2d;
+  font-size: 0.875rem;
+}

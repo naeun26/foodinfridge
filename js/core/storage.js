@@ -4,9 +4,147 @@
   var FridgeMeal = (global.FridgeMeal = global.FridgeMeal || {});
 
   var STORAGE_KEY = 'fridge_meal_bookmarks';
+  var CUSTOM_RECIPES_KEY = 'fridge_meal_custom_recipes';
+  var GEMINI_KEY_STORAGE = 'fridge_meal_gemini_key';
+
+  function sanitizeCustomRecipe(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    if (typeof raw.id !== 'string' || !raw.id.trim()) return null;
+    if (typeof raw.title !== 'string' || !raw.title.trim()) return null;
+
+    var cookTime = Number(raw.cookTime);
+    if (!Number.isFinite(cookTime) || cookTime < 1) cookTime = 15;
+    cookTime = Math.min(180, Math.round(cookTime));
+
+    var mainIngredients = Array.isArray(raw.mainIngredients)
+      ? raw.mainIngredients
+          .map(function (s) {
+            return typeof s === 'string' ? s.trim() : '';
+          })
+          .filter(Boolean)
+      : [];
+    if (mainIngredients.length === 0) return null;
+
+    var basicSeasonings = Array.isArray(raw.basicSeasonings)
+      ? raw.basicSeasonings
+          .map(function (s) {
+            return typeof s === 'string' ? s.trim() : '';
+          })
+          .filter(Boolean)
+      : [];
+
+    var steps = Array.isArray(raw.steps)
+      ? raw.steps
+          .map(function (st, idx) {
+            if (!st || typeof st.instruction !== 'string' || !st.instruction.trim()) return null;
+            var sec = Number(st.timerSec);
+            if (!Number.isFinite(sec) || sec < 0) sec = 0;
+            return {
+              stepNo: idx + 1,
+              instruction: st.instruction.trim(),
+              timerSec: Math.min(7200, Math.round(sec))
+            };
+          })
+          .filter(Boolean)
+      : [];
+    if (steps.length === 0) return null;
+
+    return {
+      id: raw.id.trim(),
+      title: raw.title.trim(),
+      cookTime: cookTime,
+      mainIngredients: mainIngredients,
+      basicSeasonings: basicSeasonings.length > 0 ? basicSeasonings : ['기본 양념 적당량'],
+      steps: steps,
+      isCustom: true
+    };
+  }
+
+  function readCustomRecipes() {
+    try {
+      var raw = global.localStorage.getItem(CUSTOM_RECIPES_KEY);
+      if (!raw) return [];
+      var parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
+      var result = [];
+      for (var i = 0; i < parsed.length; i++) {
+        var clean = sanitizeCustomRecipe(parsed[i]);
+        if (clean) result.push(clean);
+      }
+      return result;
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function writeCustomRecipes(list) {
+    try {
+      global.localStorage.setItem(CUSTOM_RECIPES_KEY, JSON.stringify(list));
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function saveCustomRecipe(recipeInput) {
+    var existing = readCustomRecipes();
+    var id =
+      recipeInput.id && recipeInput.id.indexOf('custom_') === 0
+        ? recipeInput.id
+        : 'custom_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+
+    var clean = sanitizeCustomRecipe({
+      id: id,
+      title: recipeInput.title,
+      cookTime: recipeInput.cookTime,
+      mainIngredients: recipeInput.mainIngredients,
+      basicSeasonings: recipeInput.basicSeasonings,
+      steps: recipeInput.steps
+    });
+
+    if (!clean) return null;
+
+    var replaced = false;
+    for (var i = 0; i < existing.length; i++) {
+      if (existing[i].id === clean.id) {
+        existing[i] = clean;
+        replaced = true;
+        break;
+      }
+    }
+    if (!replaced) {
+      existing.unshift(clean);
+    }
+
+    writeCustomRecipes(existing);
+    return clean;
+  }
+
+  function deleteCustomRecipe(recipeId) {
+    var existing = readCustomRecipes();
+    var next = existing.filter(function (r) {
+      return r.id !== recipeId;
+    });
+    writeCustomRecipes(next);
+
+    // 삭제된 나만의 레시피가 보관함에도 있었다면 함께 정리
+    var bookmarks = readBookmarks();
+    if (bookmarks.indexOf(recipeId) !== -1) {
+      writeBookmarks(
+        bookmarks.filter(function (id) {
+          return id !== recipeId;
+        })
+      );
+    }
+    return next;
+  }
+
+  function getAllRecipes() {
+    return readCustomRecipes().concat(FridgeMeal.RECIPES || []);
+  }
 
   function getValidRecipeIds() {
-    var recipes = FridgeMeal.RECIPES || [];
+    var recipes = getAllRecipes();
     var set = new Set();
     for (var i = 0; i < recipes.length; i++) {
       set.add(recipes[i].id);
@@ -61,10 +199,39 @@
     return { bookmarks: current, isSaved: isSaved };
   }
 
+  function readGeminiApiKey() {
+    try {
+      return (global.localStorage.getItem(GEMINI_KEY_STORAGE) || '').trim();
+    } catch (err) {
+      return '';
+    }
+  }
+
+  function writeGeminiApiKey(key) {
+    try {
+      var trimmed = String(key || '').trim();
+      if (!trimmed) {
+        global.localStorage.removeItem(GEMINI_KEY_STORAGE);
+      } else {
+        global.localStorage.setItem(GEMINI_KEY_STORAGE, trimmed);
+      }
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
   FridgeMeal.storage = {
     STORAGE_KEY: STORAGE_KEY,
+    CUSTOM_RECIPES_KEY: CUSTOM_RECIPES_KEY,
     readBookmarks: readBookmarks,
     writeBookmarks: writeBookmarks,
-    toggleBookmark: toggleBookmark
+    toggleBookmark: toggleBookmark,
+    readCustomRecipes: readCustomRecipes,
+    saveCustomRecipe: saveCustomRecipe,
+    deleteCustomRecipe: deleteCustomRecipe,
+    getAllRecipes: getAllRecipes,
+    readGeminiApiKey: readGeminiApiKey,
+    writeGeminiApiKey: writeGeminiApiKey
   };
 })(window);
