@@ -1,7 +1,14 @@
 /* ==========================================================================
-   Design Tokens — Synthesized from DESIGN-claude.md
-   Warm editorial cream canvas + warm coral CTA + dark product surfaces
+   Design Tokens — Warm editorial cream canvas + warm coral CTA
    ========================================================================== */
+
+@font-face {
+  font-family: "온글잎 박다현체";
+  src: url("../assets/fonts/OngleipParkdahyun.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   /* Brand & Accent */
@@ -45,8 +52,8 @@
   --color-error: #c64545;
 
   /* Typography Families */
-  --font-display: "Cormorant Garamond", "Noto Serif KR", Georgia, "Times New Roman", serif;
-  --font-sans: "Inter", "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-display: "온글잎 박다현체", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-sans: "온글잎 박다현체", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Spacing Scale (4px base) */
