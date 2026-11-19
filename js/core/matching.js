@@ -4,16 +4,17 @@
   var FridgeMeal = (global.FridgeMeal = global.FridgeMeal || {});
 
   /**
-   * PRD 5절 추천 정렬 로직 (Rule-Based Pipeline):
+   * 추천 정렬 로직 (Rule-Based Pipeline):
    * 1. 필터링: cookTime <= maxCookTime AND matchCount >= 1
    * 2. 0건 예외 처리: 시간 제한 자동 해제 후 matchCount >= 1 재정렬 (isTimeFallback = true)
    * 3. 정렬:
    *    1순위: matchCount 내림차순
    *    2순위: missingCount 오름차순
-   *    3순위: cookTime 오름차순
-   *    4순위: id 오름차순 (결정론적 정렬)
+   *    3순위: 보관함(즐겨찾기) 저장 레시피 우선
+   *    4순위: cookTime 오름차순
+   *    5순위: id 오름차순 (결정론적 정렬)
    */
-  function enrichRecipe(recipe, selectedSet) {
+  function enrichRecipe(recipe, selectedSet, bookmarkSet) {
     var matchedIngredients = [];
     var missingIngredients = [];
 
@@ -31,7 +32,8 @@
       matchedIngredients: matchedIngredients,
       missingIngredients: missingIngredients,
       matchCount: matchedIngredients.length,
-      missingCount: missingIngredients.length
+      missingCount: missingIngredients.length,
+      isBookmarked: Boolean(bookmarkSet && bookmarkSet.has(recipe.id))
     };
   }
 
@@ -42,21 +44,25 @@
     if (a.missingCount !== b.missingCount) {
       return a.missingCount - b.missingCount;
     }
+    if (a.isBookmarked !== b.isBookmarked) {
+      return a.isBookmarked ? -1 : 1;
+    }
     if (a.recipe.cookTime !== b.recipe.cookTime) {
       return a.recipe.cookTime - b.recipe.cookTime;
     }
     return a.recipe.id.localeCompare(b.recipe.id);
   }
 
-  function getRecommendedRecipes(recipes, selectedIngredients, maxCookTime) {
+  function getRecommendedRecipes(recipes, selectedIngredients, maxCookTime, bookmarkedIds) {
     var selectedSet = new Set(selectedIngredients || []);
     if (selectedSet.size === 0) {
       return { items: [], isTimeFallback: false };
     }
+    var bookmarkSet = new Set(bookmarkedIds || []);
 
     var allMatching = [];
     for (var i = 0; i < recipes.length; i++) {
-      var enriched = enrichRecipe(recipes[i], selectedSet);
+      var enriched = enrichRecipe(recipes[i], selectedSet, bookmarkSet);
       if (enriched.matchCount >= 1) {
         allMatching.push(enriched);
       }

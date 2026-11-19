@@ -799,7 +799,8 @@
     var result = FridgeMeal.matching.getRecommendedRecipes(
       getAllRecipes(),
       selectedArr,
-      state.maxCookTime
+      state.maxCookTime,
+      state.bookmarks
     );
 
     var selectedChipsHtml = selectedArr
@@ -840,7 +841,7 @@
       '개 추천</span>' +
       '    </div>' +
       '    <h1 class="display-md">가진 재료를 가장 많이 털어낼 레시피</h1>' +
-      '    <p class="body-sm" style="margin-top: 6px;">보유 재료 일치 개수 → 추가 재료 적은 순 → 조리 시간 빠른 순으로 정리했어요.</p>' +
+      '    <p class="body-sm" style="margin-top: 6px;">보유 재료 일치 개수 → 추가 재료 적은 순 → 보관함 저장 우선 → 조리 시간 빠른 순으로 정리했어요.</p>' +
       '    <div class="selected-summary-bar">' +
       '      <span class="selected-summary-bar__label">선택 조건</span>' +
       '      <span class="badge-coral">' +
