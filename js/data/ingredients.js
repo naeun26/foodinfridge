@@ -41,7 +41,7 @@
 
   FridgeMeal.COOK_TIME_OPTIONS = [
     { value: 10, label: '10분 이내', sub: '초스피드 한 끼' },
-    { value: 20, label: '20분 이내', sub: '가장 인기 있는 시간' },
+    { value: 20, label: '20분 이내', sub: '가장 보편적인 시간' },
     { value: 30, label: '30분 이내', sub: '여유 있게 든든히' }
   ];
 })(window);
