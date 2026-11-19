@@ -569,20 +569,54 @@
   max-width: var(--container-max);
   margin: 0 auto;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md);
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
 }
 
 .sticky-cta__summary {
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sticky-cta__summary-text {
+  display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
+  min-width: 0;
+}
+
+.sticky-cta__items {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sticky-cta__clear {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  padding: 4px 6px;
 }
 
 @media (min-width: 768px) {
+  .sticky-cta__inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+  }
+
   .sticky-cta__summary {
-    display: flex;
+    flex: 1 1 auto;
+  }
+
+  .sticky-cta__clear {
+    display: none;
   }
 }
 
@@ -1579,4 +1613,59 @@
   border: 1px solid rgba(198, 69, 69, 0.25);
   color: #8f2d2d;
   font-size: 0.875rem;
+}
+
+
+/* --------------------------------------------------------------------------
+   Screen 1: Extra Custom Ingredients Box (only shown when user added custom ones)
+   -------------------------------------------------------------------------- */
+.custom-ing-box {
+  margin-top: var(--space-md);
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-soft);
+  border: 1px solid var(--color-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.custom-ing-box__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   Screen 3: Active Repeating Timer Alarm Banner
+   -------------------------------------------------------------------------- */
+.timer-alarm-banner {
+  margin-bottom: var(--space-md);
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.timer-alarm-banner__text {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.timer-alarm-banner__btn {
+  min-height: 40px;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-size: 0.875rem;
+  font-weight: 600;
 }

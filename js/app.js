@@ -102,8 +102,11 @@
     },
     timers: new Map(),
     tickerId: null,
+    alarmStepNo: null,
     draft: createEmptyDraft()
   };
+
+  var expectedHash = null;
 
   var dom = {};
 
@@ -148,9 +151,43 @@
   }
 
   // =========================================================================
-  // Timer Management (Drift-free Date.now() delta)
+  // Timer Management (Drift-free Date.now() delta + Repeating Alarm)
   // =========================================================================
+  function hasRunningTimer() {
+    var running = false;
+    state.timers.forEach(function (t) {
+      if (t.status === 'running') running = true;
+    });
+    return running;
+  }
+
+  function renderAlarmBannerInPlace() {
+    var slot = document.querySelector('[data-alarm-banner-slot]');
+    if (!slot) return;
+    if (state.alarmStepNo === null) {
+      slot.innerHTML = '';
+      return;
+    }
+    var label = 'STEP ' + String(state.alarmStepNo).padStart(2, '0');
+    slot.innerHTML =
+      '<div class="timer-alarm-banner" role="alert">' +
+      '  <p class="timer-alarm-banner__text">🔔 ' +
+      label +
+      ' 타이머가 완료되었습니다! 불을 확인해 주세요.</p>' +
+      '  <button type="button" class="timer-alarm-banner__btn" data-action="stop-alarm">알림 끄기</button>' +
+      '</div>';
+  }
+
+  function stopActiveAlarm() {
+    FridgeMeal.kitchenApi.stopTimerAlarm();
+    if (state.alarmStepNo !== null) {
+      state.alarmStepNo = null;
+      renderAlarmBannerInPlace();
+    }
+  }
+
   function clearAllTimers() {
+    stopActiveAlarm();
     if (state.tickerId !== null) {
       global.clearInterval(state.tickerId);
       state.tickerId = null;
@@ -209,7 +246,12 @@
     });
 
     if (completedSteps.length > 0) {
-      FridgeMeal.kitchenApi.playTimerCompleteSound();
+      state.alarmStepNo = completedSteps[completedSteps.length - 1];
+      renderAlarmBannerInPlace();
+      FridgeMeal.kitchenApi.startTimerAlarm(function () {
+        state.alarmStepNo = null;
+        renderAlarmBannerInPlace();
+      });
       for (var i = 0; i < completedSteps.length; i++) {
         var stepNo = completedSteps[i];
         rerenderStepCard(stepNo);
@@ -243,6 +285,10 @@
     var timer = state.timers.get(stepNo);
     if (!timer) return;
 
+    if (state.alarmStepNo === stepNo) {
+      stopActiveAlarm();
+    }
+
     if (action === 'start' || action === 'resume') {
       FridgeMeal.kitchenApi.unlockAudio();
       if (timer.status === 'done' || timer.remainingMs <= 0) {
@@ -270,23 +316,72 @@
   }
 
   // =========================================================================
-  // Navigation & Lifecycle
+  // Navigation, URL Hash Routing & Lifecycle
   // =========================================================================
+  function getHashForRoute(view, recipeId) {
+    if (view === 'results') return '#results';
+    if (view === 'detail' && recipeId) return '#recipe/' + encodeURIComponent(recipeId);
+    if (view === 'bookmarks') return '#bookmarks';
+    if (view === 'create') return '#create';
+    return '#home';
+  }
+
+  function parseHash() {
+    var raw = String(global.location.hash || '').replace(/^#/, '');
+    if (!raw || raw === 'home') return { view: 'home', recipeId: null };
+    if (raw === 'results') return { view: 'results', recipeId: null };
+    if (raw === 'bookmarks') return { view: 'bookmarks', recipeId: null };
+    if (raw === 'create') return { view: 'create', recipeId: null };
+    if (raw.indexOf('recipe/') === 0) {
+      return { view: 'detail', recipeId: decodeURIComponent(raw.slice(7)) };
+    }
+    return { view: 'home', recipeId: null };
+  }
+
+  function syncHash(view, recipeId) {
+    var target = getHashForRoute(view, recipeId);
+    if (view === 'home' && !global.location.hash) return;
+    if (global.location.hash !== target) {
+      expectedHash = target;
+      global.location.hash = target;
+    }
+  }
+
+  function confirmLeaveRunningTimer() {
+    if (state.view === 'detail' && hasRunningTimer()) {
+      return global.confirm(
+        '실행 중인 조리 타이머가 있습니다. 화면을 나가면 타이머가 초기화됩니다. 이동할까요?'
+      );
+    }
+    return true;
+  }
+
   function navigateTo(view, options) {
     options = options || {};
-    var leavingDetail = state.view === 'detail' && view !== 'detail';
+    var leavingDetail =
+      state.view === 'detail' &&
+      (view !== 'detail' || (options.recipeId && options.recipeId !== state.currentRecipeId));
     var enteringDetail = view === 'detail';
+
+    if (leavingDetail && !options.forceLeave) {
+      if (!confirmLeaveRunningTimer()) {
+        return false;
+      }
+    }
 
     if (leavingDetail) {
       clearAllTimers();
       FridgeMeal.kitchenApi.releaseWakeLock();
     }
 
+    if (view === 'results' && state.selectedIngredients.size === 0) {
+      view = 'home';
+    }
+
     if (view === 'detail') {
       var recipe = getRecipeById(options.recipeId);
       if (!recipe) {
-        navigateTo('home');
-        return;
+        return navigateTo('home', { fromHash: options.fromHash, forceLeave: true });
       }
       state.previousView = options.from || (state.view === 'detail' ? state.previousView : state.view);
       state.currentRecipeId = recipe.id;
@@ -320,12 +415,41 @@
     }
 
     state.view = view;
+    if (!options.fromHash) {
+      syncHash(view, state.currentRecipeId);
+    }
     render();
     global.scrollTo(0, 0);
 
     if (enteringDetail) {
       FridgeMeal.kitchenApi.requestWakeLock();
     }
+    return true;
+  }
+
+  function handleHashChange() {
+    var currentHash = global.location.hash || '#home';
+    if (expectedHash && currentHash === expectedHash) {
+      expectedHash = null;
+      return;
+    }
+    expectedHash = null;
+
+    var parsed = parseHash();
+    var leavingDetail =
+      state.view === 'detail' &&
+      (parsed.view !== 'detail' || parsed.recipeId !== state.currentRecipeId);
+
+    if (leavingDetail && !confirmLeaveRunningTimer()) {
+      syncHash('detail', state.currentRecipeId);
+      return;
+    }
+
+    navigateTo(parsed.view, {
+      recipeId: parsed.recipeId,
+      fromHash: true,
+      forceLeave: true
+    });
   }
 
   // =========================================================================
@@ -389,6 +513,25 @@
       }
     }
     return count;
+  }
+
+  function getExtraCustomIngredients() {
+    var catalogSet = new Set(
+      FridgeMeal.INGREDIENTS.map(function (item) {
+        return item.name;
+      })
+    );
+    var extras = [];
+    for (var i = 0; i < state.customRecipes.length; i++) {
+      var list = state.customRecipes[i].mainIngredients || [];
+      for (var j = 0; j < list.length; j++) {
+        var name = list[j];
+        if (!catalogSet.has(name) && extras.indexOf(name) === -1) {
+          extras.push(name);
+        }
+      }
+    }
+    return extras;
   }
 
   function renderHomeView() {
@@ -480,6 +623,36 @@
           (selectedCount > 5 ? ' 외 ' + (selectedCount - 5) + '개' : '')
         : '냉장고 속 자투리 재료를 개수 제한 없이 눌러보세요';
 
+    var extraCustomIngredients = getExtraCustomIngredients();
+    var extraCustomBoxHtml =
+      extraCustomIngredients.length > 0
+        ? '<div class="custom-ing-box">' +
+          '  <div class="custom-ing-box__head">' +
+          '    <span class="title-sm">내가 추가한 레시피 재료</span>' +
+          '    <span class="body-sm">직접 등록한 레시피의 재료도 선택해 추천받을 수 있어요.</span>' +
+          '  </div>' +
+          '  <div class="chip-picker">' +
+          extraCustomIngredients
+            .map(function (ingName) {
+              var active = state.selectedIngredients.has(ingName);
+              return (
+                '<button type="button" class="chip-toggle ' +
+                (active ? 'chip-toggle--active' : '') +
+                '" data-action="toggle-ingredient" data-ingredient="' +
+                escapeHtml(ingName) +
+                '" aria-pressed="' +
+                active +
+                '">' +
+                (active ? '✓ ' : '+ ') +
+                escapeHtml(ingName) +
+                '</button>'
+              );
+            })
+            .join('') +
+          '  </div>' +
+          '</div>'
+        : '';
+
     dom.main.innerHTML =
       '<div class="container">' +
       '  <section class="hero-section">' +
@@ -503,9 +676,7 @@
       '      <div class="section-header__meta">' +
       '        <span class="badge-pill mono">' +
       selectedCount +
-      ' / ' +
-      FridgeMeal.INGREDIENTS.length +
-      ' 선택됨</span>' +
+      '개 선택됨</span>' +
       (selectedCount > 0
         ? '<button type="button" class="btn-text" data-action="clear-ingredients">선택 초기화</button>'
         : '') +
@@ -517,6 +688,7 @@
       '    <div class="ingredient-grid">' +
       cardsHtml +
       '    </div>' +
+      extraCustomBoxHtml +
       '  </section>' +
       '  <section class="section-block" aria-labelledby="cooktime-heading">' +
       '    <div class="section-header">' +
@@ -536,14 +708,19 @@
       '<div class="sticky-cta">' +
       '  <div class="sticky-cta__inner">' +
       '    <div class="sticky-cta__summary">' +
-      '      <span class="caption" style="color: var(--color-ink);">선택 재료 ' +
+      '      <div class="sticky-cta__summary-text">' +
+      '        <span class="caption" style="color: var(--color-ink);">선택 재료 ' +
       selectedCount +
       '개 · ' +
       state.maxCookTime +
       '분 이내</span>' +
-      '      <span class="body-sm">' +
+      '        <span class="body-sm sticky-cta__items">' +
       escapeHtml(summaryText) +
       '</span>' +
+      '      </div>' +
+      (selectedCount > 0
+        ? '<button type="button" class="sticky-cta__clear" data-action="clear-ingredients">초기화</button>'
+        : '') +
       '    </div>' +
       '    <button type="button" class="btn-primary sticky-cta__btn" data-action="find-recipes" ' +
       (selectedCount === 0 ? 'disabled' : '') +
@@ -1033,14 +1210,17 @@
       '    <div class="cooking-band__header">' +
       '      <div>' +
       '        <h2 id="cooking-steps-heading" class="cooking-band__title">단계별 조리 가이드 &amp; 타이머</h2>' +
-      '        <p class="cooking-band__hint">재료 손질 크기와 불 세기까지 자세히 적었어요. 타이머 종료 시 알림음이 울립니다.</p>' +
+      '        <p class="cooking-band__hint">재료 손질 크기와 불 세기까지 자세히 적었어요. 타이머 종료 시 3회 알림음이 울립니다.</p>' +
       '      </div>' +
       '    </div>' +
+      '    <div data-alarm-banner-slot></div>' +
       '    <div class="steps-stack">' +
       stepsHtml +
       '    </div>' +
       '  </div>' +
       '</section>';
+
+    renderAlarmBannerInPlace();
   }
 
   // =========================================================================
@@ -1592,6 +1772,11 @@
       return;
     }
 
+    if (action === 'stop-alarm') {
+      stopActiveAlarm();
+      return;
+    }
+
     if (
       action === 'timer-start' ||
       action === 'timer-pause' ||
@@ -1677,8 +1862,22 @@
     document.addEventListener('input', handleInput);
     document.addEventListener('submit', handleSubmit);
     document.addEventListener('keydown', handleKeyDown);
+    global.addEventListener('hashchange', handleHashChange);
+    global.addEventListener('beforeunload', function (event) {
+      if (state.view === 'detail' && hasRunningTimer()) {
+        event.preventDefault();
+        event.returnValue = '';
+      }
+    });
 
-    render();
+    var initial = parseHash();
+    if (initial.view === 'detail' && initial.recipeId && getRecipeById(initial.recipeId)) {
+      navigateTo('detail', { recipeId: initial.recipeId, from: 'home', fromHash: true });
+    } else if (initial.view === 'bookmarks' || initial.view === 'create') {
+      navigateTo(initial.view, { fromHash: true });
+    } else {
+      render();
+    }
   }
 
   if (document.readyState === 'loading') {
