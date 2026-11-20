@@ -35,7 +35,7 @@
     { id: 'zucchini', name: '애호박', category: 'vegetable', categoryLabel: '채소류', emoji: '🥒' },
     { id: 'bean_sprouts', name: '콩나물', category: 'vegetable', categoryLabel: '채소류', emoji: '🌱' },
     { id: 'mushroom', name: '버섯', category: 'vegetable', categoryLabel: '채소류', emoji: '🍄' },
-    { id: 'kimchi', name: '김치', category: 'vegetable', categoryLabel: '채소류', emoji: '🌶️' },
+    { id: 'kimchi', name: '김치', category: 'vegetable', categoryLabel: '채소류', emoji: '🥬', emojiClass: 'emoji-kimchi' },
 
     // 단백질/가공 (7)
     { id: 'egg', name: '계란', category: 'protein', categoryLabel: '단백질/가공', emoji: '🥚' },

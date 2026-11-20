@@ -479,6 +479,11 @@
   height: 1.05rem;
 }
 
+.emoji-kimchi {
+  display: inline-block;
+  filter: hue-rotate(-115deg) saturate(1.9) brightness(0.95);
+}
+
 .ingredient-card--selected .ingredient-card__emoji {
   filter: saturate(1.1);
   opacity: 1;

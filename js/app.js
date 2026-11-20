@@ -532,6 +532,9 @@
     if (item && item.iconSvg) {
       return '<span class="ing-svg-icon ' + sizeClass + '" aria-hidden="true">' + item.iconSvg + '</span>';
     }
+    if (item && item.emojiClass) {
+      return '<span class="' + item.emojiClass + '" aria-hidden="true">' + item.emoji + '</span>';
+    }
     return item ? item.emoji : '';
   }
 
