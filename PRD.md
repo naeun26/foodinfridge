@@ -129,18 +129,20 @@
 | **배포 및 운영** | **GitHub (`naeun26/foodinfridge`) + Vercel** | • `main` 브랜치 푸시 시 `https://foodinfridge.vercel.app` 자동 프로덕션 배포 |
 
 ```text
-c:\Users\keh13\vibecoding2\
+foodinfridge/
 ├── index.html                           # 앱 엔트리, 폰트 프리로드, 파비콘·푸터 미니 냉장고 로고
 ├── vercel.json                          # Vercel 정적 호스팅 설정
-├── assets/fonts/OngleipParkdahyun.ttf   # 온글잎 박다현체 전역 폰트
+├── assets/
+│   ├── fonts/OngleipParkdahyun.ttf      # 온글잎 박다현체 전역 폰트
+│   └── images/hero-logo.png             # 투명 배경 히어로 일러스트 로고
 ├── css/
 │   ├── tokens.css                       # 컬러·폰트(@font-face)·간격·반경 디자인 토큰
 │   ├── base.css                         # 리셋, 루트 20px 타이포그래피 계층, 컨테이너
 │   └── components.css                   # 전 화면 UI 컴포넌트 스타일
 └── js/
     ├── data/
-    │   ├── ingredients.js               # 기본 20종 재료 및 조리 시간 옵션
-    │   └── recipes.js                   # 내장 28종 초간단 레시피 (쉬운 계량·상세 손질)
+    │   ├── ingredients.js               # 기본 21종 재료 및 조리 시간 옵션
+    │   └── recipes.js                   # 내장 32종 초간단 레시피 (쉬운 계량·상세 손질)
     ├── core/
     │   ├── matching.js                  # 4단계 추천 정렬(보관함 우선 포함) 및 0건 Fallback
     │   ├── storage.js                   # localStorage 4종 영구 저장소 & 데이터 무결성 검증
