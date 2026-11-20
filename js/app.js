@@ -525,7 +525,31 @@
   var CUSTOM_EMOJI_OPTIONS = ['🥦', '🥕', '🍅', '🌽', '🥩', '🍤', '🌭', '🥟', '🍝', '🥑', '🫑', '🍽️'];
 
   function getAllIngredients() {
-    return FridgeMeal.INGREDIENTS.concat(state.customIngredients);
+    var base = FridgeMeal.INGREDIENTS.concat(state.customIngredients);
+    var knownSet = new Set(
+      base.map(function (item) {
+        return item.name;
+      })
+    );
+    var merged = base.slice();
+    for (var i = 0; i < state.customRecipes.length; i++) {
+      var list = state.customRecipes[i].mainIngredients || [];
+      for (var j = 0; j < list.length; j++) {
+        var name = list[j];
+        if (name && !knownSet.has(name)) {
+          knownSet.add(name);
+          merged.push({
+            id: 'recipe_ing_' + name,
+            name: name,
+            category: 'other',
+            categoryLabel: '기타',
+            emoji: '🍽️',
+            isFromRecipe: true
+          });
+        }
+      }
+    }
+    return merged;
   }
 
   function renderIngredientIcon(item, sizeClass) {
@@ -548,25 +572,6 @@
       }
     }
     return count;
-  }
-
-  function getExtraCustomIngredients() {
-    var knownSet = new Set(
-      getAllIngredients().map(function (item) {
-        return item.name;
-      })
-    );
-    var extras = [];
-    for (var i = 0; i < state.customRecipes.length; i++) {
-      var list = state.customRecipes[i].mainIngredients || [];
-      for (var j = 0; j < list.length; j++) {
-        var name = list[j];
-        if (!knownSet.has(name) && extras.indexOf(name) === -1) {
-          extras.push(name);
-        }
-      }
-    }
-    return extras;
   }
 
   function renderAddIngredientPanel() {
@@ -718,7 +723,7 @@
           '    <span class="ingredient-card__cat">' +
           '      <span class="ingredient-card__cat-dot" aria-hidden="true"></span>' +
           escapeHtml(item.categoryLabel) +
-          (item.isCustom ? ' · 직접 추가' : '') +
+          (item.isCustom ? ' · 직접 추가' : item.isFromRecipe ? ' · 내 레시피' : '') +
           '    </span>' +
           '  </div>' +
           '</button>'
@@ -777,36 +782,6 @@
           (selectedCount > 5 ? ' 외 ' + (selectedCount - 5) + '개' : '')
         : '냉장고 속 자투리 재료를 개수 제한 없이 눌러보세요';
 
-    var extraCustomIngredients = getExtraCustomIngredients();
-    var extraCustomBoxHtml =
-      extraCustomIngredients.length > 0
-        ? '<div class="custom-ing-box">' +
-          '  <div class="custom-ing-box__head">' +
-          '    <span class="title-sm">내가 추가한 레시피 재료</span>' +
-          '    <span class="body-sm">직접 등록한 레시피의 재료도 선택해 추천받을 수 있어요.</span>' +
-          '  </div>' +
-          '  <div class="chip-picker">' +
-          extraCustomIngredients
-            .map(function (ingName) {
-              var active = state.selectedIngredients.has(ingName);
-              return (
-                '<button type="button" class="chip-toggle ' +
-                (active ? 'chip-toggle--active' : '') +
-                '" data-action="toggle-ingredient" data-ingredient="' +
-                escapeHtml(ingName) +
-                '" aria-pressed="' +
-                active +
-                '">' +
-                (active ? '✓ ' : '+ ') +
-                escapeHtml(ingName) +
-                '</button>'
-              );
-            })
-            .join('') +
-          '  </div>' +
-          '</div>'
-        : '';
-
     dom.main.innerHTML =
       '<div class="container">' +
       '  <section class="hero-section">' +
@@ -844,7 +819,6 @@
       cardsHtml +
       '    </div>' +
       renderAddIngredientPanel() +
-      extraCustomBoxHtml +
       '  </section>' +
       '  <section class="section-block" aria-labelledby="cooktime-heading">' +
       '    <div class="section-header">' +
@@ -1878,6 +1852,15 @@
     }
 
     state.customRecipes = FridgeMeal.storage.readCustomRecipes();
+    // 새로 직접 입력한 주재료가 있다면 기타 카테고리 재료 목록에도 함께 등록
+    for (var mIdx = 0; mIdx < saved.mainIngredients.length; mIdx++) {
+      FridgeMeal.storage.saveCustomIngredient({
+        name: saved.mainIngredients[mIdx],
+        category: 'other',
+        emoji: '🍽️'
+      });
+    }
+    state.customIngredients = FridgeMeal.storage.readCustomIngredients();
     announce('나만의 레시피를 저장했습니다.');
     navigateTo('detail', { recipeId: saved.id, from: 'bookmarks' });
   }
@@ -2067,12 +2050,6 @@
       });
       for (var tIdx = 0; tIdx < targets.length; tIdx++) {
         state.selectedIngredients.add(targets[tIdx].name);
-      }
-      if (state.activeCategory === 'all') {
-        var extraNames = getExtraCustomIngredients();
-        for (var eIdx = 0; eIdx < extraNames.length; eIdx++) {
-          state.selectedIngredients.add(extraNames[eIdx]);
-        }
       }
       renderHomeView();
       announce('현재 목록의 재료를 모두 선택했습니다.');
