@@ -528,6 +528,13 @@
     return FridgeMeal.INGREDIENTS.concat(state.customIngredients);
   }
 
+  function renderIngredientIcon(item, sizeClass) {
+    if (item && item.iconSvg) {
+      return '<span class="ing-svg-icon ' + sizeClass + '" aria-hidden="true">' + item.iconSvg + '</span>';
+    }
+    return item ? item.emoji : '';
+  }
+
   function getCategorySelectedCount(categoryId) {
     if (categoryId === 'all') return state.selectedIngredients.size;
     var count = 0;
@@ -679,7 +686,7 @@
           '">' +
           '  <div class="ingredient-card__top">' +
           '    <span class="ingredient-card__emoji" aria-hidden="true">' +
-          item.emoji +
+          renderIngredientIcon(item, 'ing-svg-icon--card') +
           '</span>' +
           '    <span class="ingredient-card__top-right">' +
           removeBtnHtml +
@@ -1563,7 +1570,7 @@
         '" aria-pressed="' +
         active +
         '">' +
-        item.emoji +
+        renderIngredientIcon(item, 'ing-svg-icon--chip') +
         ' ' +
         escapeHtml(item.name) +
         '</button>'
