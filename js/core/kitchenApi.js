@@ -86,12 +86,13 @@
   }
 
   function stopTimerAlarm() {
+    var wasActive = alarmIntervalId !== null || alarmCycleCount > 0;
     if (alarmIntervalId !== null) {
       global.clearInterval(alarmIntervalId);
       alarmIntervalId = null;
     }
     alarmCycleCount = 0;
-    if (global.navigator && typeof global.navigator.vibrate === 'function') {
+    if (wasActive && global.navigator && typeof global.navigator.vibrate === 'function') {
       try {
         global.navigator.vibrate(0);
       } catch (err) {

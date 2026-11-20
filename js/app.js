@@ -458,6 +458,13 @@
     expectedHash = null;
 
     var parsed = parseHash();
+    if (
+      parsed.view === state.view &&
+      (parsed.view !== 'detail' || parsed.recipeId === state.currentRecipeId)
+    ) {
+      return;
+    }
+
     var leavingDetail =
       state.view === 'detail' &&
       (parsed.view !== 'detail' || parsed.recipeId !== state.currentRecipeId);
@@ -668,8 +675,8 @@
       '  <div class="form-actions">' +
       (isEditing
         ? '<button type="button" class="btn-danger-ghost" data-action="delete-custom-ing" data-ingredient="' +
-          escapeHtml(f.editingOriginalName) +
-          '">삭제</button>'
+        escapeHtml(f.editingOriginalName) +
+        '">삭제</button>'
         : '') +
       '    <button type="button" class="btn-secondary" data-action="close-add-ing-panel">취소</button>' +
       '    <button type="submit" class="btn-primary">' +
@@ -709,17 +716,17 @@
         var isEditableCustom = Boolean(item.isCustom || item.isFromRecipe);
         var customBtnsHtml = isEditableCustom
           ? '<span role="button" tabindex="0" class="ingredient-card__mini-btn" data-action="edit-custom-ing" data-ingredient="' +
+          escapeHtml(item.name) +
+          '" aria-label="' +
+          escapeHtml(item.name) +
+          ' 이름·아이콘 수정" title="이름·아이콘 수정">✎</span>' +
+          (item.isCustom
+            ? '<span role="button" tabindex="0" class="ingredient-card__remove" data-action="delete-custom-ing" data-ingredient="' +
             escapeHtml(item.name) +
             '" aria-label="' +
             escapeHtml(item.name) +
-            ' 이름·아이콘 수정" title="이름·아이콘 수정">✎</span>' +
-            (item.isCustom
-              ? '<span role="button" tabindex="0" class="ingredient-card__remove" data-action="delete-custom-ing" data-ingredient="' +
-                escapeHtml(item.name) +
-                '" aria-label="' +
-                escapeHtml(item.name) +
-                ' 삭제" title="삭제">×</span>'
-              : '')
+            ' 삭제" title="삭제">×</span>'
+            : '')
           : '';
         return (
           '<button type="button" class="ingredient-card ' +
@@ -805,7 +812,7 @@
     var summaryText =
       selectedCount > 0
         ? Array.from(state.selectedIngredients).slice(0, 5).join(', ') +
-          (selectedCount > 5 ? ' 외 ' + (selectedCount - 5) + '개' : '')
+        (selectedCount > 5 ? ' 외 ' + (selectedCount - 5) + '개' : '')
         : '냉장고 속 자투리 재료를 개수 제한 없이 눌러보세요';
 
     dom.main.innerHTML =
@@ -918,15 +925,15 @@
     var ownedChipsHtml =
       fromView === 'results'
         ? entry.matchedIngredients
-            .map(function (ing) {
-              return '<span class="ing-chip ing-chip--owned">' + escapeHtml(ing) + '</span>';
-            })
-            .join('')
+          .map(function (ing) {
+            return '<span class="ing-chip ing-chip--owned">' + escapeHtml(ing) + '</span>';
+          })
+          .join('')
         : recipe.mainIngredients
-            .map(function (ing) {
-              return '<span class="ing-chip ing-chip--neutral">' + escapeHtml(ing) + '</span>';
-            })
-            .join('');
+          .map(function (ing) {
+            return '<span class="ing-chip ing-chip--neutral">' + escapeHtml(ing) + '</span>';
+          })
+          .join('');
 
     var missingRowHtml = '';
     if (fromView === 'results' && entry.missingIngredients.length > 0) {
@@ -1021,38 +1028,38 @@
 
     var fallbackHtml = result.isTimeFallback
       ? '<div class="fallback-banner" role="status">' +
-        '  <span class="fallback-banner__icon">' +
-        ICONS.info +
-        '</span>' +
-        '  <div>' +
-        '    <p class="fallback-banner__title">선택한 시간은 조금 넘지만, 가진 재료로 만들 수 있어요!</p>' +
-        '    <p class="fallback-banner__desc">' +
-        state.maxCookTime +
-        '분 이내 조건에 맞는 레시피가 없어 시간 제한을 자동으로 해제하고 일치 재료 순으로 정렬했습니다.</p>' +
-        '  </div>' +
-        '</div>'
+      '  <span class="fallback-banner__icon">' +
+      ICONS.info +
+      '</span>' +
+      '  <div>' +
+      '    <p class="fallback-banner__title">선택한 시간은 조금 넘지만, 가진 재료로 만들 수 있어요!</p>' +
+      '    <p class="fallback-banner__desc">' +
+      state.maxCookTime +
+      '분 이내 조건에 맞는 레시피가 없어 시간 제한을 자동으로 해제하고 일치 재료 순으로 정렬했습니다.</p>' +
+      '  </div>' +
+      '</div>'
       : '';
 
     var listSectionHtml =
       result.items.length > 0
         ? '<section class="recipe-list" aria-label="추천 레시피 목록">' +
-          result.items
-            .map(function (entry, idx) {
-              return renderRecipeCard(entry, idx, 'results');
-            })
-            .join('') +
-          '</section>'
+        result.items
+          .map(function (entry, idx) {
+            return renderRecipeCard(entry, idx, 'results');
+          })
+          .join('') +
+        '</section>'
         : '<div class="empty-state-card">' +
-          '  <div class="empty-state-card__icon" aria-hidden="true">' +
-          ICONS.addIngredient +
-          '</div>' +
-          '  <h2 class="display-sm">아직 이 재료가 들어간 레시피가 없어요</h2>' +
-          '  <p class="body-md empty-state-card__text">직접 추가하신 재료로 나만의 레시피를 만들어 두면 다음부터 바로 추천받을 수 있어요!</p>' +
-          '  <div class="cook-complete-box__actions">' +
-          '    <button type="button" class="btn-primary" data-action="create-with-selected">이 재료로 레시피 만들기</button>' +
-          '    <button type="button" class="btn-secondary" data-action="go-home">재료 다시 고르기</button>' +
-          '  </div>' +
-          '</div>';
+        '  <div class="empty-state-card__icon" aria-hidden="true">' +
+        ICONS.addIngredient +
+        '</div>' +
+        '  <h2 class="display-sm">아직 이 재료가 들어간 레시피가 없어요</h2>' +
+        '  <p class="body-md empty-state-card__text">직접 추가하신 재료로 나만의 레시피를 만들어 두면 다음부터 바로 추천받을 수 있어요!</p>' +
+        '  <div class="cook-complete-box__actions">' +
+        '    <button type="button" class="btn-primary" data-action="create-with-selected">이 재료로 레시피 만들기</button>' +
+        '    <button type="button" class="btn-secondary" data-action="go-home">재료 다시 고르기</button>' +
+        '  </div>' +
+        '</div>';
 
     dom.main.innerHTML =
       '<div class="container">' +
@@ -1299,15 +1306,15 @@
 
     var customControlsHtml = recipe.isCustom
       ? '<button type="button" class="btn-secondary" data-action="edit-custom-recipe" data-recipe-id="' +
-        recipe.id +
-        '">' +
-        ICONS.edit +
-        '<span>수정</span></button>' +
-        '<button type="button" class="btn-danger-ghost" data-action="delete-custom-recipe" data-recipe-id="' +
-        recipe.id +
-        '">' +
-        ICONS.trash +
-        '<span>삭제</span></button>'
+      recipe.id +
+      '">' +
+      ICONS.edit +
+      '<span>수정</span></button>' +
+      '<button type="button" class="btn-danger-ghost" data-action="delete-custom-recipe" data-recipe-id="' +
+      recipe.id +
+      '">' +
+      ICONS.trash +
+      '<span>삭제</span></button>'
       : '';
 
     dom.main.innerHTML =
@@ -1397,20 +1404,20 @@
       '">' +
       (state.cookedThisVisit
         ? '      <p class="cook-complete-box__title">🎉 요리를 완료했어요!</p>' +
-          '      <p class="cook-complete-box__desc">보관함의 <strong>최근 만든 레시피</strong>(최대 3개)에 기록되었습니다.</p>' +
-          '      <div class="cook-complete-box__actions">' +
-          '        <button type="button" class="btn-primary" data-action="open-bookmarks">보관함에서 확인하기</button>' +
-          '        <button type="button" class="btn-secondary" data-action="go-home">다른 재료로 찾기</button>' +
-          '      </div>'
+        '      <p class="cook-complete-box__desc">보관함의 <strong>최근 만든 레시피</strong>(최대 3개)에 기록되었습니다.</p>' +
+        '      <div class="cook-complete-box__actions">' +
+        '        <button type="button" class="btn-primary" data-action="open-bookmarks">보관함에서 확인하기</button>' +
+        '        <button type="button" class="btn-secondary" data-action="go-home">다른 재료로 찾기</button>' +
+        '      </div>'
         : '      <p class="cook-complete-box__title">맛있게 완성하셨나요?</p>' +
-          '      <p class="cook-complete-box__desc">완료 버튼을 누르면 보관함의 최근 만든 레시피(최대 3개)에 기록돼요.</p>' +
-          '      <div class="cook-complete-box__actions">' +
-          '        <button type="button" class="btn-primary cook-complete-btn" data-action="complete-cooking" data-recipe-id="' +
-          recipe.id +
-          '">' +
-          ICONS.check +
-          '<span>요리 완료</span></button>' +
-          '      </div>') +
+        '      <p class="cook-complete-box__desc">완료 버튼을 누르면 보관함의 최근 만든 레시피(최대 3개)에 기록돼요.</p>' +
+        '      <div class="cook-complete-box__actions">' +
+        '        <button type="button" class="btn-primary cook-complete-btn" data-action="complete-cooking" data-recipe-id="' +
+        recipe.id +
+        '">' +
+        ICONS.check +
+        '<span>요리 완료</span></button>' +
+        '      </div>') +
       '    </div>' +
       '  </div>' +
       '</section>';
@@ -1465,12 +1472,12 @@
       '  </div>' +
       (recentEntries.length > 0
         ? '<div class="recipe-list">' +
-          recentEntries
-            .map(function (entry, idx) {
-              return renderRecipeCard(entry, idx, 'bookmarks');
-            })
-            .join('') +
-          '</div>'
+        recentEntries
+          .map(function (entry, idx) {
+            return renderRecipeCard(entry, idx, 'bookmarks');
+          })
+          .join('') +
+        '</div>'
         : '<p class="body-sm">레시피 맨 아래의 [요리 완료] 버튼을 누르면 최근 만든 요리 최대 3개가 여기에 기록돼요.</p>') +
       '</section>';
 
@@ -1510,12 +1517,12 @@
       '  </div>' +
       (customEntries.length > 0
         ? '<div class="recipe-list">' +
-          customEntries
-            .map(function (entry, idx) {
-              return renderRecipeCard(entry, idx, 'bookmarks');
-            })
-            .join('') +
-          '</div>'
+        customEntries
+          .map(function (entry, idx) {
+            return renderRecipeCard(entry, idx, 'bookmarks');
+          })
+          .join('') +
+        '</div>'
         : '<p class="body-sm">직접 만든 레시피를 등록하면 재료 추천 리스트와 타이머에도 바로 연동돼요.</p>') +
       '</section>';
 
@@ -1628,8 +1635,8 @@
           '자</span>' +
           (d.steps.length > 1
             ? '<button type="button" class="btn-text" data-action="draft-remove-step" data-step-idx="' +
-              idx +
-              '">삭제</button>'
+            idx +
+            '">삭제</button>'
             : '') +
           '  </div>' +
           '  <textarea class="form-textarea" maxlength="' +
@@ -1724,7 +1731,7 @@
       '        <span class="form-label">주재료 선택 * (' +
       d.mainIngredients.length +
       '개 선택됨)</span>' +
-      '        <p class="form-hint">기본 20종 재료에서 고르면 냉장고 추천 필터에 자동으로 매칭됩니다.</p>' +
+      '        <p class="form-hint">기본 21종 재료에서 고르면 냉장고 추천 필터에 자동으로 매칭됩니다.</p>' +
       '        <div class="chip-picker">' +
       presetChipsHtml +
       extraSelectedChipsHtml +
@@ -2322,15 +2329,15 @@
       var originalName = state.addIngForm.editingOriginalName;
       var res = originalName
         ? FridgeMeal.storage.updateCustomIngredient(originalName, {
-            name: state.addIngForm.name,
-            category: state.addIngForm.category,
-            emoji: state.addIngForm.emoji
-          })
+          name: state.addIngForm.name,
+          category: state.addIngForm.category,
+          emoji: state.addIngForm.emoji
+        })
         : FridgeMeal.storage.saveCustomIngredient({
-            name: state.addIngForm.name,
-            category: state.addIngForm.category,
-            emoji: state.addIngForm.emoji
-          });
+          name: state.addIngForm.name,
+          category: state.addIngForm.category,
+          emoji: state.addIngForm.emoji
+        });
       if (res.error) {
         state.addIngForm.error = res.error;
         renderHomeView();
