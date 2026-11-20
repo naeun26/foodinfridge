@@ -818,12 +818,19 @@
     dom.main.innerHTML =
       '<div class="container">' +
       '  <section class="hero-section">' +
-      '    <div class="hero-eyebrow caption-uppercase">' +
-      '      <span class="hero-eyebrow__dot" aria-hidden="true"></span>' +
-      '      <span>로그인 없이 바로 시작하는 1인 가구 한 끼</span>' +
+      '    <div class="hero-top">' +
+      '      <div class="hero-copy">' +
+      '        <div class="hero-eyebrow caption-uppercase">' +
+      '          <span class="hero-eyebrow__dot" aria-hidden="true"></span>' +
+      '          <span>로그인 없이 바로 시작하는 1인 가구 한 끼</span>' +
+      '        </div>' +
+      '        <h1 class="display-lg">냉장고 속 남은 재료로,<br/>오늘의 한 끼를 바로 꺼내세요.</h1>' +
+      '        <p class="body-md hero-subtitle">가진 재료를 개수 제한 없이 누르고 조리 시간만 고르면, 재료를 가장 많이 소진할 수 있는 초간단 레시피와 단계별 타이머를 바로 열어드립니다.</p>' +
+      '      </div>' +
+      '      <div class="hero-visual">' +
+      '        <img class="hero-visual__img" src="./assets/images/hero-logo.png" alt="냉장고 털이 한 끼 일러스트 로고" width="248" height="248" decoding="async" />' +
+      '      </div>' +
       '    </div>' +
-      '    <h1 class="display-lg">냉장고 속 남은 재료로,<br/>오늘의 한 끼를 바로 꺼내세요.</h1>' +
-      '    <p class="body-md hero-subtitle">가진 재료를 개수 제한 없이 누르고 조리 시간만 고르면, 재료를 가장 많이 소진할 수 있는 초간단 레시피와 단계별 타이머를 바로 열어드립니다.</p>' +
       '    <div class="seasoning-notice" role="note">' +
       '      <span class="seasoning-notice__icon" aria-hidden="true">✓</span>' +
       '      <p class="seasoning-notice__text"><strong>소금·설탕·간장·식용유</strong>는 집에 있는 것으로 가정해요. 별도 양념 체크 없이 주재료만 골라주세요.</p>' +
