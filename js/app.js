@@ -82,6 +82,7 @@
       cookTime: 15,
       mainIngredients: [],
       extraIngredientInput: '',
+      extraIngredientEmoji: '🥦',
       seasoningsText: '',
       steps: [
         { instruction: '', mins: 0, secs: 0 },
@@ -418,6 +419,7 @@
           cookTime: er.cookTime,
           mainIngredients: er.mainIngredients.slice(),
           extraIngredientInput: '',
+          extraIngredientEmoji: '🥦',
           seasoningsText: er.basicSeasonings.join(', '),
           steps: er.steps.map(function (st) {
             return {
@@ -522,7 +524,12 @@
   // =========================================================================
   // Rendering: Screen 1 — Home (Ingredients + Cook Time)
   // =========================================================================
-  var CUSTOM_EMOJI_OPTIONS = ['🥦', '🥕', '🍅', '🌽', '🥩', '🍤', '🌭', '🥟', '🍝', '🥑', '🫑', '🍽️'];
+  var CUSTOM_EMOJI_OPTIONS = [
+    '🥦', '🥕', '🍅', '🌽', '🫑', '🍆', '🥒', '🥑',
+    '🍎', '🍋', '🍓', '🍌',
+    '🥩', '🍗', '🍤', '🐟', '🌭', '🥓',
+    '🥟', '🍝', '🥖', '🥛', '🧈', '🌶️', '🧂', '🍽️'
+  ];
 
   function getAllIngredients() {
     var base = FridgeMeal.INGREDIENTS.concat(state.customIngredients);
@@ -1723,6 +1730,24 @@
       '" />' +
       '          <button type="button" class="btn-secondary" data-action="draft-add-extra-ing">추가</button>' +
       '        </div>' +
+      '        <div class="emoji-picker" style="margin-top: 6px;" aria-label="추가할 재료 아이콘 선택">' +
+      CUSTOM_EMOJI_OPTIONS.map(function (em) {
+        var active = (d.extraIngredientEmoji || '🥦') === em;
+        return (
+          '<button type="button" class="emoji-btn ' +
+          (active ? 'emoji-btn--active' : '') +
+          '" data-action="draft-set-extra-emoji" data-emoji="' +
+          em +
+          '" aria-label="아이콘 ' +
+          em +
+          '" aria-pressed="' +
+          active +
+          '">' +
+          em +
+          '</button>'
+        );
+      }).join('') +
+      '        </div>' +
       '      </div>' +
       '      <div class="form-field">' +
       '        <div class="form-label-row">' +
@@ -2109,8 +2134,18 @@
       return;
     }
 
+    if (action === 'draft-set-extra-emoji') {
+      var chosenEm = target.getAttribute('data-emoji');
+      if (chosenEm) {
+        state.draft.extraIngredientEmoji = chosenEm;
+        renderCreateView();
+      }
+      return;
+    }
+
     if (action === 'draft-add-extra-ing') {
       var L = FridgeMeal.storage.LIMITS;
+      var chosenEmoji = state.draft.extraIngredientEmoji || '🍽️';
       var rawExtra = String(state.draft.extraIngredientInput || '')
         .split(',')
         .map(function (s) {
@@ -2118,10 +2153,16 @@
         })
         .filter(Boolean);
       for (var i = 0; i < rawExtra.length; i++) {
+        FridgeMeal.storage.saveCustomIngredient({
+          name: rawExtra[i],
+          category: 'other',
+          emoji: chosenEmoji
+        });
         if (state.draft.mainIngredients.indexOf(rawExtra[i]) === -1) {
           state.draft.mainIngredients.push(rawExtra[i]);
         }
       }
+      state.customIngredients = FridgeMeal.storage.readCustomIngredients();
       state.draft.extraIngredientInput = '';
       state.draft.error = '';
       renderCreateView();
