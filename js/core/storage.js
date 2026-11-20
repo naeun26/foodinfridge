@@ -9,6 +9,14 @@
   var RECENT_COOKED_KEY = 'fridge_meal_recent_cooked';
   var MAX_RECENT_COOKED = 3;
 
+  var LIMITS = {
+    RECIPE_TITLE: 30,
+    INGREDIENT_NAME: 12,
+    SEASONING_ITEM: 25,
+    SEASONINGS_TEXT: 120,
+    STEP_INSTRUCTION: 200
+  };
+
   var CATEGORY_LABEL_MAP = {
     vegetable: '채소류',
     protein: '단백질/가공',
@@ -31,7 +39,10 @@
       var list = [];
       for (var i = 0; i < parsed.length; i++) {
         var item = parsed[i];
-        var name = item && typeof item.name === 'string' ? item.name.trim() : '';
+        var name =
+          item && typeof item.name === 'string'
+            ? item.name.trim().slice(0, LIMITS.INGREDIENT_NAME)
+            : '';
         var cat = item && CATEGORY_LABEL_MAP[item.category] ? item.category : 'vegetable';
         var emoji = item && typeof item.emoji === 'string' && item.emoji.trim() ? item.emoji.trim() : '🍽️';
         if (name && !builtInSet.has(name) && !seen.has(name)) {
@@ -64,6 +75,9 @@
   function saveCustomIngredient(input) {
     var name = input && typeof input.name === 'string' ? input.name.trim() : '';
     if (!name) return { error: '재료 이름을 입력해 주세요.' };
+    if (name.length > LIMITS.INGREDIENT_NAME) {
+      return { error: '재료 이름은 최대 ' + LIMITS.INGREDIENT_NAME + '자까지 입력할 수 있어요.' };
+    }
 
     var allBuiltIn = FridgeMeal.INGREDIENTS || [];
     for (var i = 0; i < allBuiltIn.length; i++) {
@@ -114,7 +128,7 @@
     var mainIngredients = Array.isArray(raw.mainIngredients)
       ? raw.mainIngredients
           .map(function (s) {
-            return typeof s === 'string' ? s.trim() : '';
+            return typeof s === 'string' ? s.trim().slice(0, LIMITS.INGREDIENT_NAME) : '';
           })
           .filter(Boolean)
       : [];
@@ -123,7 +137,7 @@
     var basicSeasonings = Array.isArray(raw.basicSeasonings)
       ? raw.basicSeasonings
           .map(function (s) {
-            return typeof s === 'string' ? s.trim() : '';
+            return typeof s === 'string' ? s.trim().slice(0, LIMITS.SEASONING_ITEM) : '';
           })
           .filter(Boolean)
       : [];
@@ -136,7 +150,7 @@
             if (!Number.isFinite(sec) || sec < 0) sec = 0;
             return {
               stepNo: idx + 1,
-              instruction: st.instruction.trim(),
+              instruction: st.instruction.trim().slice(0, LIMITS.STEP_INSTRUCTION),
               timerSec: Math.min(7200, Math.round(sec))
             };
           })
@@ -146,7 +160,7 @@
 
     return {
       id: raw.id.trim(),
-      title: raw.title.trim(),
+      title: raw.title.trim().slice(0, LIMITS.RECIPE_TITLE),
       cookTime: cookTime,
       mainIngredients: mainIngredients,
       basicSeasonings: basicSeasonings.length > 0 ? basicSeasonings : ['기본 양념 적당량'],
@@ -358,6 +372,7 @@
     CUSTOM_INGREDIENTS_KEY: CUSTOM_INGREDIENTS_KEY,
     RECENT_COOKED_KEY: RECENT_COOKED_KEY,
     MAX_RECENT_COOKED: MAX_RECENT_COOKED,
+    LIMITS: LIMITS,
     readBookmarks: readBookmarks,
     writeBookmarks: writeBookmarks,
     toggleBookmark: toggleBookmark,

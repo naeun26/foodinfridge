@@ -72,6 +72,7 @@ a {
   font-weight: 400;
   color: var(--color-ink);
   word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .display-lg {
@@ -127,6 +128,7 @@ a {
   line-height: 1.55;
   color: var(--color-body);
   word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .body-sm {
@@ -135,6 +137,7 @@ a {
   line-height: 1.55;
   color: var(--color-muted);
   word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .caption {

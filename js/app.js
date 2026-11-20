@@ -609,6 +609,8 @@
       );
     }).join('');
 
+    var L = FridgeMeal.storage.LIMITS;
+
     return (
       '<form class="add-ing-panel" id="add-ingredient-form" novalidate>' +
       '  <div class="add-ing-panel__head">' +
@@ -619,8 +621,19 @@
       '  </div>' +
       (f.error ? '<p class="form-error-msg" role="alert">' + escapeHtml(f.error) + '</p>' : '') +
       '  <div class="form-field">' +
-      '    <label class="form-label" for="add-ing-name">재료 이름 *</label>' +
-      '    <input type="text" id="add-ing-name" class="form-input" data-add-ing-name placeholder="예: 대패삼겹살, 당근, 브로콜리" value="' +
+      '    <div class="form-label-row">' +
+      '      <label class="form-label" for="add-ing-name">재료 이름 *</label>' +
+      '      <span class="form-char-count" data-count-for="add-ing-name">' +
+      f.name.length +
+      ' / ' +
+      L.INGREDIENT_NAME +
+      '자</span>' +
+      '    </div>' +
+      '    <input type="text" id="add-ing-name" class="form-input" data-add-ing-name maxlength="' +
+      L.INGREDIENT_NAME +
+      '" placeholder="예: 대패삼겹살, 당근, 브로콜리 (최대 ' +
+      L.INGREDIENT_NAME +
+      '자)" value="' +
       escapeHtml(f.name) +
       '" autocomplete="off" />' +
       '  </div>' +
@@ -1595,6 +1608,8 @@
       })
       .join('');
 
+    var L = FridgeMeal.storage.LIMITS;
+
     var stepsEditorHtml = d.steps
       .map(function (st, idx) {
         return (
@@ -1603,15 +1618,26 @@
           '    <span class="caption mono" style="color: var(--color-primary);">STEP ' +
           String(idx + 1).padStart(2, '0') +
           '</span>' +
+          '    <span class="form-char-count" data-count-for="step-' +
+          idx +
+          '">' +
+          String(st.instruction || '').length +
+          ' / ' +
+          L.STEP_INSTRUCTION +
+          '자</span>' +
           (d.steps.length > 1
             ? '<button type="button" class="btn-text" data-action="draft-remove-step" data-step-idx="' +
               idx +
               '">삭제</button>'
             : '') +
           '  </div>' +
-          '  <textarea class="form-textarea" data-draft-step-text="' +
+          '  <textarea class="form-textarea" maxlength="' +
+          L.STEP_INSTRUCTION +
+          '" data-draft-step-text="' +
           idx +
-          '" placeholder="예: 양파 반 개를 0.5cm 두께로 채 썰고, 중불에서 투명해질 때까지 2분간 볶아주세요.">' +
+          '" placeholder="예: 양파 반 개를 0.5cm 두께로 채 썰고, 중불에서 투명해질 때까지 2분간 볶아주세요. (최대 ' +
+          L.STEP_INSTRUCTION +
+          '자)">' +
           escapeHtml(st.instruction) +
           '</textarea>' +
           '  <div class="step-timer-inputs">' +
@@ -1654,8 +1680,19 @@
       (d.error ? '<p class="form-error-msg" role="alert">' + escapeHtml(d.error) + '</p>' : '') +
       '    <div class="form-card">' +
       '      <div class="form-field">' +
-      '        <label class="form-label" for="draft-title">레시피 이름 *</label>' +
-      '        <input type="text" id="draft-title" class="form-input" data-draft-field="title" placeholder="예: 참치 마요 김치 덮밥" value="' +
+      '        <div class="form-label-row">' +
+      '          <label class="form-label" for="draft-title">레시피 이름 *</label>' +
+      '          <span class="form-char-count" data-count-for="draft-title">' +
+      String(d.title || '').length +
+      ' / ' +
+      L.RECIPE_TITLE +
+      '자</span>' +
+      '        </div>' +
+      '        <input type="text" id="draft-title" class="form-input" data-draft-field="title" maxlength="' +
+      L.RECIPE_TITLE +
+      '" placeholder="예: 참치 마요 김치 덮밥 (최대 ' +
+      L.RECIPE_TITLE +
+      '자)" value="' +
       escapeHtml(d.title) +
       '" required />' +
       '      </div>' +
@@ -1693,17 +1730,39 @@
       '        </div>' +
       '      </div>' +
       '      <div class="form-field">' +
-      '        <label class="form-label" for="draft-extra-ing">목록에 없는 재료 직접 추가 (선택)</label>' +
+      '        <div class="form-label-row">' +
+      '          <label class="form-label" for="draft-extra-ing">목록에 없는 재료 직접 추가 (선택)</label>' +
+      '          <span class="form-char-count" data-count-for="draft-extra-ing">' +
+      String(d.extraIngredientInput || '').length +
+      ' / ' +
+      L.INGREDIENT_NAME +
+      '자</span>' +
+      '        </div>' +
       '        <div class="extra-ing-row">' +
-      '          <input type="text" id="draft-extra-ing" class="form-input" data-draft-field="extraIngredientInput" placeholder="예: 대패삼겹살, 마요네즈" value="' +
+      '          <input type="text" id="draft-extra-ing" class="form-input" data-draft-field="extraIngredientInput" maxlength="' +
+      L.INGREDIENT_NAME +
+      '" placeholder="예: 대패삼겹살 (한 번에 1개, 최대 ' +
+      L.INGREDIENT_NAME +
+      '자)" value="' +
       escapeHtml(d.extraIngredientInput) +
       '" />' +
       '          <button type="button" class="btn-secondary" data-action="draft-add-extra-ing">추가</button>' +
       '        </div>' +
       '      </div>' +
       '      <div class="form-field">' +
-      '        <label class="form-label" for="draft-seasonings">양념 계량 (쉼표로 구분)</label>' +
-      '        <input type="text" id="draft-seasonings" class="form-input" data-draft-field="seasoningsText" placeholder="예: 간장 밥숟가락 2스푼, 설탕 밥숟가락 1스푼, 식용유 밥숟가락 1스푼" value="' +
+      '        <div class="form-label-row">' +
+      '          <label class="form-label" for="draft-seasonings">양념 계량 (쉼표로 구분)</label>' +
+      '          <span class="form-char-count" data-count-for="draft-seasonings">' +
+      String(d.seasoningsText || '').length +
+      ' / ' +
+      L.SEASONINGS_TEXT +
+      '자</span>' +
+      '        </div>' +
+      '        <input type="text" id="draft-seasonings" class="form-input" data-draft-field="seasoningsText" maxlength="' +
+      L.SEASONINGS_TEXT +
+      '" placeholder="예: 간장 밥숟가락 2스푼, 설탕 밥숟가락 1스푼 (최대 ' +
+      L.SEASONINGS_TEXT +
+      '자)" value="' +
       escapeHtml(d.seasoningsText) +
       '" />' +
       '      </div>' +
@@ -1758,9 +1817,15 @@
   function handleCustomRecipeSubmit(event) {
     event.preventDefault();
     var d = state.draft;
+    var L = FridgeMeal.storage.LIMITS;
 
     if (!d.title.trim()) {
       d.error = '레시피 이름을 입력해 주세요.';
+      renderCreateView();
+      return;
+    }
+    if (d.title.trim().length > L.RECIPE_TITLE) {
+      d.error = '레시피 이름은 최대 ' + L.RECIPE_TITLE + '자까지 입력할 수 있어요.';
       renderCreateView();
       return;
     }
@@ -2049,10 +2114,11 @@
     }
 
     if (action === 'draft-add-extra-ing') {
+      var L = FridgeMeal.storage.LIMITS;
       var rawExtra = String(state.draft.extraIngredientInput || '')
         .split(',')
         .map(function (s) {
-          return s.trim();
+          return s.trim().slice(0, L.INGREDIENT_NAME);
         })
         .filter(Boolean);
       for (var i = 0; i < rawExtra.length; i++) {
@@ -2098,18 +2164,34 @@
     }
   }
 
+  function updateCharCounter(key, len, max) {
+    var el = document.querySelector('[data-count-for="' + key + '"]');
+    if (el) {
+      el.textContent = len + ' / ' + max + '자';
+    }
+  }
+
   function handleInput(event) {
     var el = event.target;
     if (!el) return;
+    var L = FridgeMeal.storage.LIMITS;
 
     if (el.hasAttribute('data-add-ing-name')) {
       state.addIngForm.name = el.value;
+      updateCharCounter('add-ing-name', el.value.length, L.INGREDIENT_NAME);
       return;
     }
 
     var field = el.getAttribute('data-draft-field');
     if (field) {
       state.draft[field] = el.value;
+      if (field === 'title') updateCharCounter('draft-title', el.value.length, L.RECIPE_TITLE);
+      if (field === 'extraIngredientInput') {
+        updateCharCounter('draft-extra-ing', el.value.length, L.INGREDIENT_NAME);
+      }
+      if (field === 'seasoningsText') {
+        updateCharCounter('draft-seasonings', el.value.length, L.SEASONINGS_TEXT);
+      }
       return;
     }
 
@@ -2117,6 +2199,7 @@
     if (stepTextIdx !== null) {
       var i1 = Number(stepTextIdx);
       if (state.draft.steps[i1]) state.draft.steps[i1].instruction = el.value;
+      updateCharCounter('step-' + i1, el.value.length, L.STEP_INSTRUCTION);
       return;
     }
 
