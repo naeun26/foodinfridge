@@ -109,6 +109,7 @@
     cookedThisVisit: false,
     addIngForm: {
       open: false,
+      editingOriginalName: null,
       name: '',
       category: 'vegetable',
       emoji: '🥦',
@@ -622,13 +623,16 @@
     }).join('');
 
     var L = FridgeMeal.storage.LIMITS;
+    var isEditing = Boolean(f.editingOriginalName);
 
     return (
       '<form class="add-ing-panel" id="add-ingredient-form" novalidate>' +
       '  <div class="add-ing-panel__head">' +
       '    <h3 class="add-ing-panel__title">' +
       ICONS.addIngredient +
-      '<span>내 냉장고 재료 추가</span></h3>' +
+      '<span>' +
+      (isEditing ? '추가한 재료 수정' : '내 냉장고 재료 추가') +
+      '</span></h3>' +
       '    <button type="button" class="btn-text" data-action="close-add-ing-panel">닫기</button>' +
       '  </div>' +
       (f.error ? '<p class="form-error-msg" role="alert">' + escapeHtml(f.error) + '</p>' : '') +
@@ -662,8 +666,15 @@
       '</div>' +
       '  </div>' +
       '  <div class="form-actions">' +
+      (isEditing
+        ? '<button type="button" class="btn-danger-ghost" data-action="delete-custom-ing" data-ingredient="' +
+          escapeHtml(f.editingOriginalName) +
+          '">삭제</button>'
+        : '') +
       '    <button type="button" class="btn-secondary" data-action="close-add-ing-panel">취소</button>' +
-      '    <button type="submit" class="btn-primary">추가하고 바로 선택</button>' +
+      '    <button type="submit" class="btn-primary">' +
+      (isEditing ? '수정 저장' : '추가하고 바로 선택') +
+      '</button>' +
       '  </div>' +
       '</form>'
     );
@@ -695,12 +706,20 @@
     var cardsHtml = visibleIngredients
       .map(function (item) {
         var selected = state.selectedIngredients.has(item.name);
-        var removeBtnHtml = item.isCustom
-          ? '<span role="button" tabindex="0" class="ingredient-card__remove" data-action="delete-custom-ing" data-ingredient="' +
+        var isEditableCustom = Boolean(item.isCustom || item.isFromRecipe);
+        var customBtnsHtml = isEditableCustom
+          ? '<span role="button" tabindex="0" class="ingredient-card__mini-btn" data-action="edit-custom-ing" data-ingredient="' +
             escapeHtml(item.name) +
             '" aria-label="' +
             escapeHtml(item.name) +
-            ' 삭제">×</span>'
+            ' 이름·아이콘 수정" title="이름·아이콘 수정">✎</span>' +
+            (item.isCustom
+              ? '<span role="button" tabindex="0" class="ingredient-card__remove" data-action="delete-custom-ing" data-ingredient="' +
+                escapeHtml(item.name) +
+                '" aria-label="' +
+                escapeHtml(item.name) +
+                ' 삭제" title="삭제">×</span>'
+              : '')
           : '';
         return (
           '<button type="button" class="ingredient-card ' +
@@ -717,7 +736,7 @@
           renderIngredientIcon(item, 'ing-svg-icon--card') +
           '</span>' +
           '    <span class="ingredient-card__top-right">' +
-          removeBtnHtml +
+          customBtnsHtml +
           '      <span class="ingredient-card__check" aria-hidden="true">' +
           ICONS.check +
           '</span>' +
@@ -1987,8 +2006,11 @@
     }
 
     if (action === 'toggle-add-ing-panel') {
-      state.addIngForm.open = !state.addIngForm.open;
+      var wasOpenForAdd = state.addIngForm.open && !state.addIngForm.editingOriginalName;
+      state.addIngForm.editingOriginalName = null;
+      state.addIngForm.name = '';
       state.addIngForm.error = '';
+      state.addIngForm.open = !wasOpenForAdd;
       if (state.addIngForm.open) {
         if (state.activeCategory !== 'all') {
           state.addIngForm.category = state.activeCategory;
@@ -2002,8 +2024,38 @@
       return;
     }
 
+    if (action === 'edit-custom-ing') {
+      event.stopPropagation();
+      var targetName = target.getAttribute('data-ingredient');
+      if (!targetName) return;
+      var allIngs = getAllIngredients();
+      var found = null;
+      for (var fi = 0; fi < allIngs.length; fi++) {
+        if (allIngs[fi].name === targetName) {
+          found = allIngs[fi];
+          break;
+        }
+      }
+      if (!found) return;
+      state.addIngForm.open = true;
+      state.addIngForm.editingOriginalName = found.name;
+      state.addIngForm.name = found.name;
+      state.addIngForm.category = found.category || 'other';
+      state.addIngForm.emoji = found.emoji || '🍽️';
+      state.addIngForm.error = '';
+      renderHomeView();
+      var editPanel = document.getElementById('add-ingredient-form');
+      if (editPanel && typeof editPanel.scrollIntoView === 'function') {
+        editPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      var editInput = document.getElementById('add-ing-name');
+      if (editInput) editInput.focus();
+      return;
+    }
+
     if (action === 'close-add-ing-panel') {
       state.addIngForm.open = false;
+      state.addIngForm.editingOriginalName = null;
       state.addIngForm.name = '';
       state.addIngForm.error = '';
       renderHomeView();
@@ -2035,6 +2087,12 @@
       if (!delIng) return;
       state.customIngredients = FridgeMeal.storage.deleteCustomIngredient(delIng);
       state.selectedIngredients.delete(delIng);
+      if (state.addIngForm.editingOriginalName === delIng) {
+        state.addIngForm.open = false;
+        state.addIngForm.editingOriginalName = null;
+        state.addIngForm.name = '';
+        state.addIngForm.error = '';
+      }
       renderHomeView();
       announce(delIng + ' 재료를 목록에서 삭제했습니다.');
       return;
@@ -2261,23 +2319,43 @@
     }
     if (event.target && event.target.id === 'add-ingredient-form') {
       event.preventDefault();
-      var res = FridgeMeal.storage.saveCustomIngredient({
-        name: state.addIngForm.name,
-        category: state.addIngForm.category,
-        emoji: state.addIngForm.emoji
-      });
+      var originalName = state.addIngForm.editingOriginalName;
+      var res = originalName
+        ? FridgeMeal.storage.updateCustomIngredient(originalName, {
+            name: state.addIngForm.name,
+            category: state.addIngForm.category,
+            emoji: state.addIngForm.emoji
+          })
+        : FridgeMeal.storage.saveCustomIngredient({
+            name: state.addIngForm.name,
+            category: state.addIngForm.category,
+            emoji: state.addIngForm.emoji
+          });
       if (res.error) {
         state.addIngForm.error = res.error;
         renderHomeView();
         return;
       }
       state.customIngredients = res.list;
-      state.selectedIngredients.add(res.item.name);
+      if (originalName) {
+        state.customRecipes = FridgeMeal.storage.readCustomRecipes();
+        if (state.selectedIngredients.has(originalName)) {
+          state.selectedIngredients.delete(originalName);
+          state.selectedIngredients.add(res.item.name);
+        }
+      } else {
+        state.selectedIngredients.add(res.item.name);
+      }
       state.addIngForm.open = false;
+      state.addIngForm.editingOriginalName = null;
       state.addIngForm.name = '';
       state.addIngForm.error = '';
       renderHomeView();
-      announce(res.item.name + ' 재료를 추가하고 선택했습니다.');
+      announce(
+        originalName
+          ? res.item.name + ' 재료 정보를 수정했습니다.'
+          : res.item.name + ' 재료를 추가하고 선택했습니다.'
+      );
     }
   }
 

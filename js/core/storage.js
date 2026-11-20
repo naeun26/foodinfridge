@@ -116,6 +116,74 @@
     return next;
   }
 
+  function updateCustomIngredient(oldName, input) {
+    var newName = input && typeof input.name === 'string' ? input.name.trim() : '';
+    if (!newName) return { error: '재료 이름을 입력해 주세요.' };
+    if (newName.length > LIMITS.INGREDIENT_NAME) {
+      return { error: '재료 이름은 최대 ' + LIMITS.INGREDIENT_NAME + '자까지 입력할 수 있어요.' };
+    }
+
+    var allBuiltIn = FridgeMeal.INGREDIENTS || [];
+    for (var i = 0; i < allBuiltIn.length; i++) {
+      if (allBuiltIn[i].name === newName) {
+        return { error: '이미 기본 목록에 있는 재료 이름이에요.' };
+      }
+    }
+
+    var existing = readCustomIngredients();
+    var targetIdx = -1;
+    for (var j = 0; j < existing.length; j++) {
+      if (existing[j].name === oldName) {
+        targetIdx = j;
+      } else if (existing[j].name === newName) {
+        return { error: '이미 같은 이름의 추가 재료가 있어요.' };
+      }
+    }
+
+    var cat = input && CATEGORY_LABEL_MAP[input.category] ? input.category : 'other';
+    var emoji = input && typeof input.emoji === 'string' && input.emoji.trim() ? input.emoji.trim() : '🍽️';
+    var updatedItem = {
+      id: targetIdx >= 0 ? existing[targetIdx].id : 'custom_ing_' + Date.now(),
+      name: newName,
+      category: cat,
+      categoryLabel: CATEGORY_LABEL_MAP[cat],
+      emoji: emoji,
+      isCustom: true
+    };
+
+    if (targetIdx >= 0) {
+      existing[targetIdx] = updatedItem;
+    } else {
+      existing.push(updatedItem);
+    }
+    writeCustomIngredients(existing);
+
+    // 재료 이름이 바뀌었으면 나만의 레시피 안의 주재료 이름도 함께 동기화
+    if (oldName && oldName !== newName) {
+      var customRecipes = readCustomRecipes();
+      var recipesChanged = false;
+      for (var r = 0; r < customRecipes.length; r++) {
+        var ings = customRecipes[r].mainIngredients || [];
+        var changed = false;
+        var nextIngs = [];
+        for (var k = 0; k < ings.length; k++) {
+          var mapped = ings[k] === oldName ? newName : ings[k];
+          if (ings[k] === oldName) changed = true;
+          if (nextIngs.indexOf(mapped) === -1) nextIngs.push(mapped);
+        }
+        if (changed) {
+          customRecipes[r].mainIngredients = nextIngs;
+          recipesChanged = true;
+        }
+      }
+      if (recipesChanged) {
+        writeCustomRecipes(customRecipes);
+      }
+    }
+
+    return { item: updatedItem, list: existing };
+  }
+
   function sanitizeCustomRecipe(raw) {
     if (!raw || typeof raw !== 'object') return null;
     if (typeof raw.id !== 'string' || !raw.id.trim()) return null;
@@ -381,6 +449,7 @@
     deleteCustomRecipe: deleteCustomRecipe,
     readCustomIngredients: readCustomIngredients,
     saveCustomIngredient: saveCustomIngredient,
+    updateCustomIngredient: updateCustomIngredient,
     deleteCustomIngredient: deleteCustomIngredient,
     readRecentCooked: readRecentCooked,
     recordCookedRecipe: recordCookedRecipe,

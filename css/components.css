@@ -1829,18 +1829,24 @@
   gap: 6px;
 }
 
+.ingredient-card__mini-btn,
 .ingredient-card__remove {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: var(--radius-pill);
   background-color: var(--color-canvas);
   border: 1px solid var(--color-hairline);
   color: var(--color-muted);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.ingredient-card__mini-btn:active {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .ingredient-card__remove:active {
