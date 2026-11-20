@@ -61,7 +61,7 @@
 * **채소류 (8):** 양배추🥬, 대파🧅, 양파🧄, 감자🥔, 애호박🥒, 콩나물🌱, 버섯🍄, 김치🌶️
 * **단백질/가공 (7):** 계란🥚, 두부🧈, **참치캔🐟**, 스팸/햄🍖, 베이컨🥓, 닭가슴살🍗, 어묵🍢
 * **탄수화물/면 (5):** 찬밥🍚, 식빵🍞, **라면🍜** *(기존 `우동사리` 제외 및 `라면사리` → `라면` 통일)*, 떡국떡🍡, 치즈🧀
-* **직접 재료 추가:** 그리드 맨 마지막에 전용 **그릇+`+` SVG 아이콘**이 적용된 **`[재료 추가]` 카드**를 배치해 사용자가 원하는 재료(이름·카테고리·음식 이모지 12종)를 추가·삭제할 수 있다.
+* **직접 재료 추가:** 그리드 맨 마지막에 전용 **채소·과일(토마토·레몬·잎) SVG 아이콘**이 적용된 **`[재료 추가]` 카드**를 배치해 사용자가 원하는 재료(이름·카테고리·음식 이모지 12종)를 추가·삭제할 수 있다.
 
 ---
 
@@ -123,7 +123,7 @@
 | 영역 | 선정 기술 | 적용 방식 |
 | :--- | :--- | :--- |
 | **프론트엔드** | **HTML5 + CSS Custom Properties + Vanilla JS** | • 외부 npm 의존성 0개, 빌드 없이 즉시 실행 및 Vercel 2초 내 배포<br>• `window.FridgeMeal` 네임스페이스 기반 모듈 분리 |
-| **타이포 & 에셋** | **`온글잎 박다현체` (로컬 `.ttf`) + `JetBrains Mono` + 인라인 SVG** | • `assets/fonts/OngleipParkdahyun.ttf` 프리로드<br>• 미니 냉장고 로고·그릇+`+` 아이콘·UI 아이콘 모두 경량 인라인 SVG |
+| **타이포 & 에셋** | **`온글잎 박다현체` (로컬 `.ttf`) + `JetBrains Mono` + 인라인 SVG** | • `assets/fonts/OngleipParkdahyun.ttf` 프리로드<br>• 미니 냉장고 로고·채소·과일 아이콘·UI 아이콘 모두 경량 인라인 SVG |
 | **데이터 & 영구 저장** | **로컬 JS 데이터 + `localStorage` 4개 키** | • `fridge_meal_bookmarks` (즐겨찾기 ID 배열)<br>• `fridge_meal_custom_recipes` (나만의 레시피 배열)<br>• `fridge_meal_custom_ingredients` (직접 추가 재료 배열)<br>• `fridge_meal_recent_cooked` (최근 만든 레시피 최대 3개) |
 | **주방 브라우저 API** | **Web Audio API / Vibration / Screen Wake Lock** | • 외부 음원 없이 3회 반복 완료 차임음 합성 + 진동 + 조리 중 화면 꺼짐 방지 |
 | **배포 및 운영** | **GitHub (`naeun26/foodinfridge`) + Vercel** | • `main` 브랜치 푸시 시 `https://foodinfridge.vercel.app` 자동 프로덕션 배포 |

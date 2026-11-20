@@ -59,10 +59,11 @@
       '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>' +
       '</svg>',
     addIngredient:
-      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-      '<path d="M4.5 11H19.5C19.2 15.6 15.9 18.8 12 18.8C8.1 18.8 4.8 15.6 4.5 11Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>' +
-      '<path d="M8.5 20.8H15.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>' +
-      '<path d="M12 3.8V8.4M9.7 6.1H14.3" stroke="var(--color-primary)" stroke-width="2.1" stroke-linecap="round"/>' +
+      '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+      '<path d="M11 8.8C11 5.4 13.6 3.5 17 3.8C17.2 6.8 14.8 9 11 8.8Z" fill="var(--color-success)" stroke="var(--color-ink)" stroke-width="1.5" stroke-linejoin="round"/>' +
+      '<circle cx="15.2" cy="14.2" r="4.5" fill="var(--color-accent-amber)" stroke="var(--color-ink)" stroke-width="1.6"/>' +
+      '<circle cx="9.4" cy="14.8" r="5" fill="var(--color-primary)" stroke="var(--color-ink)" stroke-width="1.6"/>' +
+      '<path d="M7.6 10.1L9.4 8.6L11.2 10.1" stroke="var(--color-success)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>' +
       '</svg>',
     edit:
       '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
