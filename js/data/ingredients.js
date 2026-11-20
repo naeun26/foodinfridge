@@ -10,7 +10,7 @@
     { id: 'carb', label: '탄수화물/면' }
   ];
 
-  // PRD 4.2 기준 20종 재료 (라면사리 포함, 우동사리 제외)
+  // 기본 20종 재료 (라면 포함, 우동사리 제외)
   FridgeMeal.INGREDIENTS = [
     // 채소류 (8)
     { id: 'cabbage', name: '양배추', category: 'vegetable', categoryLabel: '채소류', emoji: '🥬' },
@@ -31,10 +31,10 @@
     { id: 'chicken_breast', name: '닭가슴살', category: 'protein', categoryLabel: '단백질/가공', emoji: '🍗' },
     { id: 'fish_cake', name: '어묵', category: 'protein', categoryLabel: '단백질/가공', emoji: '🍢' },
 
-    // 탄수화물/면 (5) — 라면사리 포함, 우동사리 제외
+    // 탄수화물/면 (5) — 라면 포함, 우동사리 제외
     { id: 'rice', name: '찬밥', category: 'carb', categoryLabel: '탄수화물/면', emoji: '🍚' },
     { id: 'bread', name: '식빵', category: 'carb', categoryLabel: '탄수화물/면', emoji: '🍞' },
-    { id: 'ramen_noodle', name: '라면사리', category: 'carb', categoryLabel: '탄수화물/면', emoji: '🍜' },
+    { id: 'ramen_noodle', name: '라면', category: 'carb', categoryLabel: '탄수화물/면', emoji: '🍜' },
     { id: 'rice_cake', name: '떡국떡', category: 'carb', categoryLabel: '탄수화물/면', emoji: '🍡' },
     { id: 'cheese', name: '치즈', category: 'carb', categoryLabel: '탄수화물/면', emoji: '🧀' }
   ];
