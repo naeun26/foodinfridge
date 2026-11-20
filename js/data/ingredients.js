@@ -7,7 +7,8 @@
     { id: 'all', label: '전체' },
     { id: 'vegetable', label: '채소류' },
     { id: 'protein', label: '단백질/가공' },
-    { id: 'carb', label: '탄수화물/면' }
+    { id: 'carb', label: '탄수화물/면' },
+    { id: 'other', label: '기타' }
   ];
 
   // 기본 20종 재료 (라면 포함, 우동사리 제외)

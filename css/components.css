@@ -429,6 +429,10 @@
   --cat-dot: #5db8a6;
 }
 
+.ingredient-card[data-category="other"] {
+  --cat-dot: var(--color-primary);
+}
+
 .ingredient-card--selected {
   background-color: var(--color-accent-surface);
   border-color: var(--color-primary);

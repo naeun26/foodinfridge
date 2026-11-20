@@ -12,7 +12,8 @@
   var CATEGORY_LABEL_MAP = {
     vegetable: '채소류',
     protein: '단백질/가공',
-    carb: '탄수화물/면'
+    carb: '탄수화물/면',
+    other: '기타'
   };
 
   function readCustomIngredients() {
