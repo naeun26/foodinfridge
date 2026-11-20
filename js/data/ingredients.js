@@ -16,7 +16,7 @@
     // 채소류 (8)
     { id: 'cabbage', name: '양배추', category: 'vegetable', categoryLabel: '채소류', emoji: '🥬' },
     { id: 'green_onion', name: '대파', category: 'vegetable', categoryLabel: '채소류', emoji: '🧅' },
-    { id: 'onion', name: '양파', category: 'vegetable', categoryLabel: '채소류', emoji: '🧄' },
+    { id: 'onion', name: '양파', category: 'vegetable', categoryLabel: '채소류', emoji: '🧅' },
     { id: 'potato', name: '감자', category: 'vegetable', categoryLabel: '채소류', emoji: '🥔' },
     { id: 'zucchini', name: '애호박', category: 'vegetable', categoryLabel: '채소류', emoji: '🥒' },
     { id: 'bean_sprouts', name: '콩나물', category: 'vegetable', categoryLabel: '채소류', emoji: '🌱' },
