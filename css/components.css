@@ -1719,3 +1719,124 @@
   min-width: 220px;
   font-size: 1.05rem;
 }
+
+
+/* --------------------------------------------------------------------------
+   Screen 1: Add Custom Ingredient Card & Inline Form Panel
+   -------------------------------------------------------------------------- */
+.ingredient-card--add {
+  background-color: var(--color-canvas);
+  border: 1.5px dashed var(--color-accent-border);
+  color: var(--color-ink);
+}
+
+.ingredient-card--add:active,
+.ingredient-card--add-open {
+  background-color: var(--color-accent-surface);
+  border-style: solid;
+  border-color: var(--color-primary);
+}
+
+.ingredient-card__add-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-accent-surface);
+  color: var(--color-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ingredient-card--add-open .ingredient-card__add-icon {
+  background-color: var(--color-canvas);
+}
+
+.ingredient-card__add-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ingredient-card__top-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ingredient-card__remove {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ingredient-card__remove:active {
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+.add-ing-panel {
+  margin-top: var(--space-md);
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-accent-surface);
+  border: 1.5px solid var(--color-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.add-ing-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.add-ing-panel__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.emoji-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.emoji-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emoji-btn--active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-ring);
+}

@@ -58,6 +58,12 @@
       '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" aria-hidden="true">' +
       '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>' +
       '</svg>',
+    addIngredient:
+      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+      '<path d="M4.5 11H19.5C19.2 15.6 15.9 18.8 12 18.8C8.1 18.8 4.8 15.6 4.5 11Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>' +
+      '<path d="M8.5 20.8H15.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>' +
+      '<path d="M12 3.8V8.4M9.7 6.1H14.3" stroke="var(--color-primary)" stroke-width="2.1" stroke-linecap="round"/>' +
+      '</svg>',
     edit:
       '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
       '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>' +
@@ -96,8 +102,16 @@
     currentRecipeId: null,
     bookmarks: [],
     customRecipes: [],
+    customIngredients: [],
     recentCooked: [],
     cookedThisVisit: false,
+    addIngForm: {
+      open: false,
+      name: '',
+      category: 'vegetable',
+      emoji: '🥦',
+      error: ''
+    },
     wakeLock: {
       active: false,
       supported: FridgeMeal.kitchenApi.isWakeLockSupported()
@@ -507,10 +521,16 @@
   // =========================================================================
   // Rendering: Screen 1 — Home (Ingredients + Cook Time)
   // =========================================================================
+  var CUSTOM_EMOJI_OPTIONS = ['🥦', '🥕', '🍅', '🌽', '🥩', '🍤', '🌭', '🥟', '🍝', '🥑', '🫑', '🍽️'];
+
+  function getAllIngredients() {
+    return FridgeMeal.INGREDIENTS.concat(state.customIngredients);
+  }
+
   function getCategorySelectedCount(categoryId) {
     if (categoryId === 'all') return state.selectedIngredients.size;
     var count = 0;
-    var list = FridgeMeal.INGREDIENTS;
+    var list = getAllIngredients();
     for (var i = 0; i < list.length; i++) {
       if (list[i].category === categoryId && state.selectedIngredients.has(list[i].name)) {
         count++;
@@ -520,8 +540,8 @@
   }
 
   function getExtraCustomIngredients() {
-    var catalogSet = new Set(
-      FridgeMeal.INGREDIENTS.map(function (item) {
+    var knownSet = new Set(
+      getAllIngredients().map(function (item) {
         return item.name;
       })
     );
@@ -530,7 +550,7 @@
       var list = state.customRecipes[i].mainIngredients || [];
       for (var j = 0; j < list.length; j++) {
         var name = list[j];
-        if (!catalogSet.has(name) && extras.indexOf(name) === -1) {
+        if (!knownSet.has(name) && extras.indexOf(name) === -1) {
           extras.push(name);
         }
       }
@@ -538,9 +558,84 @@
     return extras;
   }
 
+  function renderAddIngredientPanel() {
+    var f = state.addIngForm;
+    if (!f.open) return '';
+
+    var catPills = FridgeMeal.CATEGORIES.filter(function (c) {
+      return c.id !== 'all';
+    })
+      .map(function (c) {
+        var active = f.category === c.id;
+        return (
+          '<button type="button" class="chip-toggle ' +
+          (active ? 'chip-toggle--active' : '') +
+          '" data-action="add-ing-set-cat" data-category="' +
+          c.id +
+          '" aria-pressed="' +
+          active +
+          '">' +
+          escapeHtml(c.label) +
+          '</button>'
+        );
+      })
+      .join('');
+
+    var emojiButtons = CUSTOM_EMOJI_OPTIONS.map(function (em) {
+      var active = f.emoji === em;
+      return (
+        '<button type="button" class="emoji-btn ' +
+        (active ? 'emoji-btn--active' : '') +
+        '" data-action="add-ing-set-emoji" data-emoji="' +
+        em +
+        '" aria-label="아이콘 ' +
+        em +
+        '" aria-pressed="' +
+        active +
+        '">' +
+        em +
+        '</button>'
+      );
+    }).join('');
+
+    return (
+      '<form class="add-ing-panel" id="add-ingredient-form" novalidate>' +
+      '  <div class="add-ing-panel__head">' +
+      '    <h3 class="add-ing-panel__title">' +
+      ICONS.addIngredient +
+      '<span>내 냉장고 재료 추가</span></h3>' +
+      '    <button type="button" class="btn-text" data-action="close-add-ing-panel">닫기</button>' +
+      '  </div>' +
+      (f.error ? '<p class="form-error-msg" role="alert">' + escapeHtml(f.error) + '</p>' : '') +
+      '  <div class="form-field">' +
+      '    <label class="form-label" for="add-ing-name">재료 이름 *</label>' +
+      '    <input type="text" id="add-ing-name" class="form-input" data-add-ing-name placeholder="예: 대패삼겹살, 당근, 브로콜리" value="' +
+      escapeHtml(f.name) +
+      '" autocomplete="off" />' +
+      '  </div>' +
+      '  <div class="form-field">' +
+      '    <span class="form-label">카테고리</span>' +
+      '    <div class="chip-picker">' +
+      catPills +
+      '</div>' +
+      '  </div>' +
+      '  <div class="form-field">' +
+      '    <span class="form-label">아이콘 선택</span>' +
+      '    <div class="emoji-picker">' +
+      emojiButtons +
+      '</div>' +
+      '  </div>' +
+      '  <div class="form-actions">' +
+      '    <button type="button" class="btn-secondary" data-action="close-add-ing-panel">취소</button>' +
+      '    <button type="submit" class="btn-primary">추가하고 바로 선택</button>' +
+      '  </div>' +
+      '</form>'
+    );
+  }
+
   function renderHomeView() {
     var selectedCount = state.selectedIngredients.size;
-    var visibleIngredients = FridgeMeal.INGREDIENTS.filter(function (item) {
+    var visibleIngredients = getAllIngredients().filter(function (item) {
       return state.activeCategory === 'all' || item.category === state.activeCategory;
     });
 
@@ -564,6 +659,13 @@
     var cardsHtml = visibleIngredients
       .map(function (item) {
         var selected = state.selectedIngredients.has(item.name);
+        var removeBtnHtml = item.isCustom
+          ? '<span role="button" tabindex="0" class="ingredient-card__remove" data-action="delete-custom-ing" data-ingredient="' +
+            escapeHtml(item.name) +
+            '" aria-label="' +
+            escapeHtml(item.name) +
+            ' 삭제">×</span>'
+          : '';
         return (
           '<button type="button" class="ingredient-card ' +
           (selected ? 'ingredient-card--selected' : '') +
@@ -578,9 +680,12 @@
           '    <span class="ingredient-card__emoji" aria-hidden="true">' +
           item.emoji +
           '</span>' +
-          '    <span class="ingredient-card__check" aria-hidden="true">' +
+          '    <span class="ingredient-card__top-right">' +
+          removeBtnHtml +
+          '      <span class="ingredient-card__check" aria-hidden="true">' +
           ICONS.check +
           '</span>' +
+          '    </span>' +
           '  </div>' +
           '  <div class="ingredient-card__bottom">' +
           '    <span class="ingredient-card__name">' +
@@ -589,12 +694,33 @@
           '    <span class="ingredient-card__cat">' +
           '      <span class="ingredient-card__cat-dot" aria-hidden="true"></span>' +
           escapeHtml(item.categoryLabel) +
+          (item.isCustom ? ' · 직접 추가' : '') +
           '    </span>' +
           '  </div>' +
           '</button>'
         );
       })
       .join('');
+
+    cardsHtml +=
+      '<button type="button" class="ingredient-card ingredient-card--add ' +
+      (state.addIngForm.open ? 'ingredient-card--add-open' : '') +
+      '" data-action="toggle-add-ing-panel" aria-expanded="' +
+      state.addIngForm.open +
+      '">' +
+      '  <div class="ingredient-card__top">' +
+      '    <span class="ingredient-card__add-icon" aria-hidden="true">' +
+      ICONS.addIngredient +
+      '</span>' +
+      '    <span class="ingredient-card__add-badge" aria-hidden="true">' +
+      ICONS.plus +
+      '</span>' +
+      '  </div>' +
+      '  <div class="ingredient-card__bottom">' +
+      '    <span class="ingredient-card__name">재료 추가</span>' +
+      '    <span class="ingredient-card__cat">직접 입력하기</span>' +
+      '  </div>' +
+      '</button>';
 
     var timeHtml = FridgeMeal.COOK_TIME_OPTIONS.map(function (opt) {
       var active = state.maxCookTime === opt.value;
@@ -692,6 +818,7 @@
       '    <div class="ingredient-grid">' +
       cardsHtml +
       '    </div>' +
+      renderAddIngredientPanel() +
       extraCustomBoxHtml +
       '  </section>' +
       '  <section class="section-block" aria-labelledby="cooktime-heading">' +
@@ -881,11 +1008,26 @@
         '</div>'
       : '';
 
-    var listHtml = result.items
-      .map(function (entry, idx) {
-        return renderRecipeCard(entry, idx, 'results');
-      })
-      .join('');
+    var listSectionHtml =
+      result.items.length > 0
+        ? '<section class="recipe-list" aria-label="추천 레시피 목록">' +
+          result.items
+            .map(function (entry, idx) {
+              return renderRecipeCard(entry, idx, 'results');
+            })
+            .join('') +
+          '</section>'
+        : '<div class="empty-state-card">' +
+          '  <div class="empty-state-card__icon" aria-hidden="true">' +
+          ICONS.addIngredient +
+          '</div>' +
+          '  <h2 class="display-sm">아직 이 재료가 들어간 레시피가 없어요</h2>' +
+          '  <p class="body-md empty-state-card__text">직접 추가하신 재료로 나만의 레시피를 만들어 두면 다음부터 바로 추천받을 수 있어요!</p>' +
+          '  <div class="cook-complete-box__actions">' +
+          '    <button type="button" class="btn-primary" data-action="create-with-selected">이 재료로 레시피 만들기</button>' +
+          '    <button type="button" class="btn-secondary" data-action="go-home">재료 다시 고르기</button>' +
+          '  </div>' +
+          '</div>';
 
     dom.main.innerHTML =
       '<div class="container">' +
@@ -909,9 +1051,7 @@
       '    </div>' +
       '  </section>' +
       fallbackHtml +
-      '  <section class="recipe-list" aria-label="추천 레시피 목록">' +
-      listHtml +
-      '  </section>' +
+      listSectionHtml +
       '</div>';
   }
 
@@ -1407,11 +1547,12 @@
   function renderCreateView() {
     var d = state.draft;
     var isEditing = Boolean(d.id);
-    var catalogNames = FridgeMeal.INGREDIENTS.map(function (item) {
+    var allIngredients = getAllIngredients();
+    var catalogNames = allIngredients.map(function (item) {
       return item.name;
     });
 
-    var presetChipsHtml = FridgeMeal.INGREDIENTS.map(function (item) {
+    var presetChipsHtml = allIngredients.map(function (item) {
       var active = d.mainIngredients.indexOf(item.name) !== -1;
       return (
         '<button type="button" class="chip-toggle ' +
@@ -1760,6 +1901,68 @@
       return;
     }
 
+    if (action === 'toggle-add-ing-panel') {
+      state.addIngForm.open = !state.addIngForm.open;
+      state.addIngForm.error = '';
+      if (state.addIngForm.open) {
+        if (state.activeCategory !== 'all') {
+          state.addIngForm.category = state.activeCategory;
+        }
+        renderHomeView();
+        var nameEl = document.getElementById('add-ing-name');
+        if (nameEl) nameEl.focus();
+      } else {
+        renderHomeView();
+      }
+      return;
+    }
+
+    if (action === 'close-add-ing-panel') {
+      state.addIngForm.open = false;
+      state.addIngForm.name = '';
+      state.addIngForm.error = '';
+      renderHomeView();
+      return;
+    }
+
+    if (action === 'add-ing-set-cat') {
+      var nextCat = target.getAttribute('data-category');
+      if (nextCat) {
+        state.addIngForm.category = nextCat;
+        state.addIngForm.error = '';
+        renderHomeView();
+      }
+      return;
+    }
+
+    if (action === 'add-ing-set-emoji') {
+      var nextEmoji = target.getAttribute('data-emoji');
+      if (nextEmoji) {
+        state.addIngForm.emoji = nextEmoji;
+        renderHomeView();
+      }
+      return;
+    }
+
+    if (action === 'delete-custom-ing') {
+      event.stopPropagation();
+      var delIng = target.getAttribute('data-ingredient');
+      if (!delIng) return;
+      state.customIngredients = FridgeMeal.storage.deleteCustomIngredient(delIng);
+      state.selectedIngredients.delete(delIng);
+      renderHomeView();
+      announce(delIng + ' 재료를 목록에서 삭제했습니다.');
+      return;
+    }
+
+    if (action === 'create-with-selected') {
+      var prefill = Array.from(state.selectedIngredients);
+      navigateTo('create');
+      state.draft.mainIngredients = prefill;
+      renderCreateView();
+      return;
+    }
+
     if (action === 'select-category') {
       var cat = target.getAttribute('data-category');
       if (cat && cat !== state.activeCategory) {
@@ -1888,6 +2091,11 @@
     var el = event.target;
     if (!el) return;
 
+    if (el.hasAttribute('data-add-ing-name')) {
+      state.addIngForm.name = el.value;
+      return;
+    }
+
     var field = el.getAttribute('data-draft-field');
     if (field) {
       state.draft[field] = el.value;
@@ -1918,6 +2126,27 @@
   function handleSubmit(event) {
     if (event.target && event.target.id === 'custom-recipe-form') {
       handleCustomRecipeSubmit(event);
+      return;
+    }
+    if (event.target && event.target.id === 'add-ingredient-form') {
+      event.preventDefault();
+      var res = FridgeMeal.storage.saveCustomIngredient({
+        name: state.addIngForm.name,
+        category: state.addIngForm.category,
+        emoji: state.addIngForm.emoji
+      });
+      if (res.error) {
+        state.addIngForm.error = res.error;
+        renderHomeView();
+        return;
+      }
+      state.customIngredients = res.list;
+      state.selectedIngredients.add(res.item.name);
+      state.addIngForm.open = false;
+      state.addIngForm.name = '';
+      state.addIngForm.error = '';
+      renderHomeView();
+      announce(res.item.name + ' 재료를 추가하고 선택했습니다.');
     }
   }
 
@@ -1944,6 +2173,7 @@
     dom.liveRegion = document.getElementById('live-announcer');
 
     state.customRecipes = FridgeMeal.storage.readCustomRecipes();
+    state.customIngredients = FridgeMeal.storage.readCustomIngredients();
     state.bookmarks = FridgeMeal.storage.readBookmarks();
     state.recentCooked = FridgeMeal.storage.readRecentCooked();
 

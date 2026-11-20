@@ -5,8 +5,101 @@
 
   var STORAGE_KEY = 'fridge_meal_bookmarks';
   var CUSTOM_RECIPES_KEY = 'fridge_meal_custom_recipes';
+  var CUSTOM_INGREDIENTS_KEY = 'fridge_meal_custom_ingredients';
   var RECENT_COOKED_KEY = 'fridge_meal_recent_cooked';
   var MAX_RECENT_COOKED = 3;
+
+  var CATEGORY_LABEL_MAP = {
+    vegetable: '채소류',
+    protein: '단백질/가공',
+    carb: '탄수화물/면'
+  };
+
+  function readCustomIngredients() {
+    try {
+      var raw = global.localStorage.getItem(CUSTOM_INGREDIENTS_KEY);
+      if (!raw) return [];
+      var parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
+      var builtInSet = new Set(
+        (FridgeMeal.INGREDIENTS || []).map(function (it) {
+          return it.name;
+        })
+      );
+      var seen = new Set();
+      var list = [];
+      for (var i = 0; i < parsed.length; i++) {
+        var item = parsed[i];
+        var name = item && typeof item.name === 'string' ? item.name.trim() : '';
+        var cat = item && CATEGORY_LABEL_MAP[item.category] ? item.category : 'vegetable';
+        var emoji = item && typeof item.emoji === 'string' && item.emoji.trim() ? item.emoji.trim() : '🍽️';
+        if (name && !builtInSet.has(name) && !seen.has(name)) {
+          seen.add(name);
+          list.push({
+            id: 'custom_ing_' + i + '_' + name,
+            name: name,
+            category: cat,
+            categoryLabel: CATEGORY_LABEL_MAP[cat],
+            emoji: emoji,
+            isCustom: true
+          });
+        }
+      }
+      return list;
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function writeCustomIngredients(list) {
+    try {
+      global.localStorage.setItem(CUSTOM_INGREDIENTS_KEY, JSON.stringify(list));
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function saveCustomIngredient(input) {
+    var name = input && typeof input.name === 'string' ? input.name.trim() : '';
+    if (!name) return { error: '재료 이름을 입력해 주세요.' };
+
+    var allBuiltIn = FridgeMeal.INGREDIENTS || [];
+    for (var i = 0; i < allBuiltIn.length; i++) {
+      if (allBuiltIn[i].name === name) {
+        return { error: '이미 기본 목록에 있는 재료예요.' };
+      }
+    }
+
+    var existing = readCustomIngredients();
+    for (var j = 0; j < existing.length; j++) {
+      if (existing[j].name === name) {
+        return { error: '이미 추가된 재료예요.' };
+      }
+    }
+
+    var cat = input && CATEGORY_LABEL_MAP[input.category] ? input.category : 'vegetable';
+    var emoji = input && typeof input.emoji === 'string' && input.emoji.trim() ? input.emoji.trim() : '🍽️';
+    var entry = {
+      id: 'custom_ing_' + Date.now(),
+      name: name,
+      category: cat,
+      categoryLabel: CATEGORY_LABEL_MAP[cat],
+      emoji: emoji,
+      isCustom: true
+    };
+    existing.push(entry);
+    writeCustomIngredients(existing);
+    return { item: entry, list: existing };
+  }
+
+  function deleteCustomIngredient(name) {
+    var next = readCustomIngredients().filter(function (item) {
+      return item.name !== name;
+    });
+    writeCustomIngredients(next);
+    return next;
+  }
 
   function sanitizeCustomRecipe(raw) {
     if (!raw || typeof raw !== 'object') return null;
@@ -261,6 +354,7 @@
   FridgeMeal.storage = {
     STORAGE_KEY: STORAGE_KEY,
     CUSTOM_RECIPES_KEY: CUSTOM_RECIPES_KEY,
+    CUSTOM_INGREDIENTS_KEY: CUSTOM_INGREDIENTS_KEY,
     RECENT_COOKED_KEY: RECENT_COOKED_KEY,
     MAX_RECENT_COOKED: MAX_RECENT_COOKED,
     readBookmarks: readBookmarks,
@@ -269,6 +363,9 @@
     readCustomRecipes: readCustomRecipes,
     saveCustomRecipe: saveCustomRecipe,
     deleteCustomRecipe: deleteCustomRecipe,
+    readCustomIngredients: readCustomIngredients,
+    saveCustomIngredient: saveCustomIngredient,
+    deleteCustomIngredient: deleteCustomIngredient,
     readRecentCooked: readRecentCooked,
     recordCookedRecipe: recordCookedRecipe,
     getAllRecipes: getAllRecipes
