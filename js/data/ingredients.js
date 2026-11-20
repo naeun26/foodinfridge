@@ -25,7 +25,7 @@
     // 단백질/가공 (7)
     { id: 'egg', name: '계란', category: 'protein', categoryLabel: '단백질/가공', emoji: '🥚' },
     { id: 'tofu', name: '두부', category: 'protein', categoryLabel: '단백질/가공', emoji: '🧈' },
-    { id: 'tuna', name: '참치캔', category: 'protein', categoryLabel: '단백질/가공', emoji: '🥫' },
+    { id: 'tuna', name: '참치캔', category: 'protein', categoryLabel: '단백질/가공', emoji: '🐟' },
     { id: 'spam', name: '스팸/햄', category: 'protein', categoryLabel: '단백질/가공', emoji: '🍖' },
     { id: 'bacon', name: '베이컨', category: 'protein', categoryLabel: '단백질/가공', emoji: '🥓' },
     { id: 'chicken_breast', name: '닭가슴살', category: 'protein', categoryLabel: '단백질/가공', emoji: '🍗' },
