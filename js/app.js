@@ -831,6 +831,7 @@
       '        <span class="badge-pill mono">' +
       selectedCount +
       '개 선택됨</span>' +
+      '        <button type="button" class="btn-text" data-action="select-all-ingredients">모두 선택</button>' +
       (selectedCount > 0
         ? '<button type="button" class="btn-text" data-action="clear-ingredients">선택 초기화</button>'
         : '') +
@@ -2057,6 +2058,24 @@
         state.selectedIngredients.add(name);
       }
       renderHomeView();
+      return;
+    }
+
+    if (action === 'select-all-ingredients') {
+      var targets = getAllIngredients().filter(function (item) {
+        return state.activeCategory === 'all' || item.category === state.activeCategory;
+      });
+      for (var tIdx = 0; tIdx < targets.length; tIdx++) {
+        state.selectedIngredients.add(targets[tIdx].name);
+      }
+      if (state.activeCategory === 'all') {
+        var extraNames = getExtraCustomIngredients();
+        for (var eIdx = 0; eIdx < extraNames.length; eIdx++) {
+          state.selectedIngredients.add(extraNames[eIdx]);
+        }
+      }
+      renderHomeView();
+      announce('현재 목록의 재료를 모두 선택했습니다.');
       return;
     }
 
