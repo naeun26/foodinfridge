@@ -1376,7 +1376,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Editorial Dark Footer (DESIGN-claude.md: #181715, never inverts)
+   Editorial Dark Footer (DESIGN.md: #181715, never inverts)
    -------------------------------------------------------------------------- */
 .site-footer {
   background-color: var(--color-surface-dark);
@@ -1540,7 +1540,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Screen 5: Custom Recipe Form (DESIGN-claude.md text-input & hairline card)
+   Screen 5: Custom Recipe Form (DESIGN.md text-input & hairline card)
    -------------------------------------------------------------------------- */
 .recipe-form {
   display: flex;
