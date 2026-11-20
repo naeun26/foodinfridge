@@ -481,7 +481,7 @@
 
 .emoji-kimchi {
   display: inline-block;
-  filter: hue-rotate(-115deg) saturate(1.9) brightness(0.95);
+  filter: hue-rotate(-88deg) saturate(2.1) brightness(1.02);
 }
 
 .ingredient-card--selected .ingredient-card__emoji {
